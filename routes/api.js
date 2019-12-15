@@ -4,13 +4,44 @@ const util = require('util');
 const User = require('../models/user.js').User;
 const bcrypt = require('bcryptjs');
 const utilOptions = {depth: null};
+const jwt = require('jsonwebtoken');
 
 router.post('/login', function(req, res) {
     console.log('req body login : ', util.inspect(req.body, utilOptions));
     let inputEmail = req.body.email;
 	let inputPassword = req.body.password;
 	
-	
+	// find the user
+	User.findOne({where: { email: inputEmail }}).then((userRecord) => {
+		//const user = users[0];
+		const user = userRecord.dataValues;
+		const hash = userRecord.get('passwordHash');
+		console.log("user result :", util.inspect(user, utilOptions));
+
+		delete user['passwordHash'];
+
+		bcrypt.compare(inputPassword, hash, function(err3, res2) {
+			if (!err3 && res2 === true) {
+				console.log("user found :", util.inspect(user, utilOptions));
+				getToken(inputEmail).then((jwt) => {
+					res.status(200).json({
+						message: 'success',
+						user: user,
+						jwt: jwt
+					});
+				});
+			}
+			else {
+				console.log('error while logging user in : ', err3);
+				res.status(404).json({
+					message: 'error'
+				});
+			}
+		});
+	}).catch((err) => {
+		console.log('error creating user : ', util.inspect(err, utilOptions));
+		res.json({message: 'signup failed'}).status(404);
+	});
 
 });
 
@@ -33,7 +64,7 @@ router.post('/register', function(req, res) {
 							email: inputEmail
 						});
 					}).catch((err) => {
-						console.log('error creating user : ', util.inspect(err, {depth: null}));
+						console.log('error creating user : ', util.inspect(err, utilOptions));
 						res.json({message: 'signup failed'});
 					});
 				}
@@ -53,49 +84,47 @@ router.post('/register', function(req, res) {
 
 });
 
+function getToken(email) {
+	return new Promise((resolve, reject) => {
+		resolve(jwt.sign({email: email}, '987fdgo1z09qjla0934lksdp0', { expiresIn: 24*60*60 }));
+	});
+}
 
-router.get('/getToken', function(req, res) {
-    if (req.session.user) {
-        // Generate JWT - set expire to 1 day
-        res.json({success: true,
-            token: jwt.sign({email:req.session.user.email}, '987fdgo1z09qjla0934lksdp0', {expiresIn: 24*60*60 })
-        });
-    }
-    else {
-        res.json({token: null});
-    }
-});
+function verifyToken(req, res, next) {
+	if (req.url != '/api/register' && req.url != 'api/login') {
+		jwt.verify(token, '987fdgo1z09qjla0934lksdp0', function(err, decoded) {
+			if (err) {
+				console.log('Failed to authenticate token..');
 
-
-router.get('/verifyToken', function(req, res) {
-    jwt.verify(token, '987fdgo1z09qjla0934lksdp0', function(err, decoded) {
-		if (err) {
-			console.log('Failed to authenticate token..');
-
-			return res.status(403).send({
-				success: false,
-				message: 'Failed to authenticate token....'
-			});
-		}
-		else {
-			console.log('verified token : ', util.inspect(decoded, utilOptions));
-			if (decoded && decoded.email) {
-				// Set user UID in the request
-				// In a real application the user profile should be retrieved from the persistent storage here
-				// req.user = {
-				// 	email: decoded.email
-				// };
-				if (!req.session.user) {
-					req.session.user = {};
-				}
-
-				req.session.user.email = decoded.email;
-
-				return next();
+				return res.status(403).send({
+					success: false,
+					message: 'Failed to authenticate token....'
+				});
 			}
-		}
-    });
-});
+			else {
+				console.log('verified token : ', util.inspect(decoded, utilOptions));
+				if (decoded && decoded.user.email) {
+					// Set user UID in the request
+					// In a real application the user profile should be retrieved from the persistent storage here
+					// req.user = {
+					// 	email: decoded.email
+					// };
+					if (!req.session.user) {
+						req.session.user = decoded.user;
+					}
+
+					req.session.user = decoded.user;
+
+					return next();
+				}
+			}
+		});
+	}
+	else {
+		return next();
+	}
+}
 
 
 exports.router = router;
+exports.verifyToken = verifyToken;

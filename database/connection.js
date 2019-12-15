@@ -23,4 +23,4 @@ else {
 
 const sequelize = new Sequelize(config);
 
-exports.sequelize = sequelize;
+module.exports = sequelize;
