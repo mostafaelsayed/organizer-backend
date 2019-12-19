@@ -37,8 +37,8 @@ router.post('/login', function(req, res) {
 			}
 		});
 	}).catch((err) => {
-		console.log('error creating user : ', util.inspect(err, utilOptions));
-		res.json({message: 'signup failed'}).status(404);
+		console.log('error logging user in : ', util.inspect(err, utilOptions));
+		res.json({message: 'login failed'}).status(404);
 	});
 
 });
@@ -63,18 +63,18 @@ router.post('/register', function(req, res) {
 						});
 					}).catch((err) => {
 						console.log('error creating user : ', util.inspect(err, utilOptions));
-						res.json({message: 'signup failed'});
+						res.json({message: 'signup failed'}).status(500);
 					});
 				}
 				else {
 					console.log('error hashing password : ', util.inspect(err2, utilOptions));
-					res.json({message: 'signup failed'});
+					res.json({message: 'signup failed'}).status(500);
 				}
 			});
 		}
 		else {
 			console.log('error genSalt : ', util.inspect(err1, utilOptions));
-			res.json({message: 'signup failed'});
+			res.json({message: 'signup failed'}).status(500);
 		}
 	});
 	
