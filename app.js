@@ -5,6 +5,7 @@ const cors = require('cors');
 const verifyToken = require('./utils').verifyToken;
 const bodyParser = require('body-parser');
 const userRouter = require('./routes/user/user');
+const reservationRouter = require('./routes/reservation/reservation');
 const app = express();
 const expressSession = require('express-session');
 
@@ -27,6 +28,8 @@ app.use(bodyParser.json());
 app.use('/api/user', userRouter);
 
 app.use('/api/reservation', verifyToken);
+
+app.use('/api/reservation', reservationRouter);
 
 app.listen(port, function() {
     console.log(`Listening on port ${port}`);

@@ -32,4 +32,4 @@ const User = dbConnection.define('users', {
   timestamps: false
 });
 
-exports.User = User;
+module.exports = User;
