@@ -1,10 +1,10 @@
+
+require('./globals');
 const express = require('express');
-const port = process.env.PORT || 4000;
-const cors = require('cors')
-const bodyParser = require('body-parser')
-const router = require('./routes/api').router;
-const verifyToken = require('./routes/api').verifyToken;
-const jwt = require("jsonwebtoken");
+const cors = require('cors');
+const verifyToken = require('./utils').verifyToken;
+const bodyParser = require('body-parser');
+const userRouter = require('./routes/user/user');
 const app = express();
 const expressSession = require('express-session');
 
@@ -24,10 +24,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-app.use('/api', router);
+app.use('/api/user', userRouter);
 
-app.use('/api', verifyToken);
+app.use('/api/reservation', verifyToken);
 
 app.listen(port, function() {
     console.log(`Listening on port ${port}`);
-})
+});
