@@ -1,5 +1,5 @@
 
-require('./globals');
+//require('./globals');
 const express = require('express');
 const cors = require('cors');
 const verifyToken = require('./utils').verifyToken;
@@ -8,6 +8,7 @@ const userRouter = require('./routes/user/user');
 const reservationRouter = require('./routes/reservation/reservation');
 const app = express();
 const expressSession = require('express-session');
+const port = require('./config').port;
 
 // enable cors for all origins
 app.use(cors());

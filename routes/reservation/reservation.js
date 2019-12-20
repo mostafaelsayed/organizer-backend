@@ -1,5 +1,7 @@
 const router = require('express').Router();
-const Reservation = require('../../models/reservation.js');
+const Reservation = require('../../models/reservation/reservation');
+const util = require('../../config').util;
+const utilOptions = require('../../config').utilOptions;
 
 
 router.get('/getAll', function(req, res) {

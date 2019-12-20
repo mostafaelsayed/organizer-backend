@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const dbConnection = require('../../config').dbConnection;
 const Reservation = dbConnection.define('reservations', {
   name: {
     type: Sequelize.STRING,

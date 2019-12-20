@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken');
+const util = require('./config').util;
+const utilOptions = require('./config').utilOptions;
 
 
 function getToken(email) {

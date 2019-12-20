@@ -1,8 +1,10 @@
 
 const bcrypt = require('bcryptjs');
-const User = require('../../models/user');
+const User = require('../../models/user/user');
 const router = require('express').Router();
 const utils = require('../../utils');
+const util = require('../../config').util;
+const utilOptions = require('../../config').utilOptions;
 
 router.post('/login', function(req, res) {
     console.log('req body login : ', util.inspect(req.body, utilOptions));
