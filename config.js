@@ -11,5 +11,6 @@ module.exports = {
     utilOptions: utilOptions,
     dbConnection: dbConnection,
     util: util,
-    port: process.env.PORT || 4000
+    port: process.env.PORT || 4000,
+    secret: process.env.SECRET || '987fdgo1z09qjla0934lksdp0',
 };

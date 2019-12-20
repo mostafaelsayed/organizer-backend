@@ -23,12 +23,12 @@ router.post('/login', function(req, res) {
 		bcrypt.compare(inputPassword, hash, function(err3, res2) {
 			if (!err3 && res2 === true) {
 				console.log("user found :", util.inspect(user, utilOptions));
-				utils.getToken(inputEmail).then((jwt) => {
-					res.status(200).json({
-						message: 'success',
-						user: user,
-						jwt: jwt
-					});
+				let jwt = utils.getToken(inputEmail);
+				req.session.user = user;
+				res.status(200).json({
+					message: 'success',
+					user: user,
+					jwt: jwt
 				});
 			}
 			else {
