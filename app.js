@@ -10,15 +10,19 @@ const app = express();
 const expressSession = require('express-session');
 const port = require('./config').port;
 
-// enable cors for all origins
-app.use(cors());
+const session = expressSession({
+	saveUninitialized: false,
+	resave: false,
+	secret: 'organizer-app'
+});
 
 // use express-session
-app.use(expressSession({
-	saveUninitialized: true,
-	resave: true,
-	secret: 'organizer-app'
-}));
+app.use(session);
+
+// enable cors for all origins
+
+// why credentials and origin to get session to work ??
+app.use(cors({credentials: true, origin: true}));
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));

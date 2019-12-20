@@ -25,6 +25,13 @@ router.post('/login', function(req, res) {
 				console.log("user found :", util.inspect(user, utilOptions));
 				let jwt = utils.getToken(inputEmail);
 				req.session.user = user;
+				
+				req.session.save((err) => {
+					if (err) {
+						console.log('user session not saved : ', err);
+					}
+				});
+				console.log('after login user session : ', util.inspect(req.session.user, utilOptions));
 				res.status(200).json({
 					message: 'success',
 					user: user,
@@ -34,7 +41,7 @@ router.post('/login', function(req, res) {
 			else {
 				console.log('error while logging user in : ', err3);
 				res.status(404).json({
-					message: 'error'
+					message: 'login failed'
 				});
 			}
 		});

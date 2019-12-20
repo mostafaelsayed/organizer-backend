@@ -5,7 +5,8 @@ const utilOptions = require('../../config').utilOptions;
 
 
 router.get('/getAll', function(req, res) {
-    Reservation.findAll().then((reservations) => {
+    console.log('req.session.user : ', util.inspect(req.session.user, utilOptions));
+    Reservation.findAll({ where: { userId: req.session.user.id } }).then((reservations) => {
         console.log('all reservations : ', util.inspect(reservations, utilOptions));
         res.json({
             message: 'success',
