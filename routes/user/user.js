@@ -52,6 +52,12 @@ router.post('/login', function(req, res) {
 
 });
 
+router.get('/getUserInSession', function(req, res) {
+	res.json({
+		user: req.session.user
+	});
+});
+
 router.post('/register', function(req, res) {
     console.log('req body register : ', util.inspect(req.body, utilOptions));
 	let inputEmail = req.body.email;
@@ -89,6 +95,12 @@ router.post('/register', function(req, res) {
 	
 	
 
+});
+
+router.get('/logout', function(req, res) {
+	req.session.user = undefined;
+
+	res.send('success');
 });
 
 

@@ -13,7 +13,11 @@ function verifyToken(req, res, next) {
 	console.log('req headers : ', util.inspect(req.headers, utilOptions));
 	console.log('req url : ', util.inspect(req.url, utilOptions));
 
-	if (req.url != '/api/register' && req.url != 'api/login') {
+	if (req.method == 'POST') {
+		console.log('req body : ', util.inspect(req.body, utilOptions));
+	}
+
+	if (req.url != '/api/register' && req.url != '/api/login') {
 		jwt.verify(token, secret, function(err, decoded) {
 			if (err) {
 				console.log('Failed to authenticate token..');
