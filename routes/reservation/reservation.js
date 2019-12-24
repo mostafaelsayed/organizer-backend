@@ -7,11 +7,19 @@ const utilOptions = require('../../config').utilOptions;
 router.get('/getAll', function(req, res) {
     console.log('req.session.user : ', util.inspect(req.session.user, utilOptions));
     Reservation.findAll({ where: { userId: req.session.user.id } }).then((reservations) => {
-        console.log('success get reservations : ', reservations[0].dataValues);
-        res.json({
-            message: 'success',
-            reservations: reservations
-        }).status(200);
+        if (reservations[0]) {
+            console.log('success get reservations : ', reservations[0].dataValues);
+            res.json({
+                message: 'success',
+                reservations: reservations.map((e) => {return e.dataValues;})
+            }).status(200);
+        }
+        else {
+            res.json({
+                message: 'not found',
+                reservations: []
+            }).status(404);
+        }
     });
 });
 
