@@ -23,6 +23,21 @@ router.get('/getAll', function(req, res) {
     });
 });
 
+router.get('/get/:id', function(req, res) {
+    Reservation.findOne({where: {id: req.params.id}}).then((success) => {
+        console.log('success get reservation : ', util.inspect(success, utilOptions));
+        res.json({
+            message: 'success',
+            reservation: success.dataValues
+        }).status(200);
+    }).catch((err) => {
+        console.error('error get reservation : ', util.inspect(err, utilOptions));
+        res.json({
+            message: 'error'
+        }).status(500);
+    });
+});
+
 router.post('/add', function(req, res) {
     Reservation.create({name: req.body.reservation.name, userId: req.body.userId}).then((success) => {
         console.log('success add reservation : ', util.inspect(success, utilOptions));
