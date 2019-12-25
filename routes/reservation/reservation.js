@@ -37,5 +37,19 @@ router.post('/add', function(req, res) {
     })
 });
 
+router.post('/delete', function(req, res) {
+    Reservation.destroy({where: {id: req.body.reservationId}}).then((success) => {
+        console.log('success delete reservation : ', util.inspect(success, utilOptions));
+        res.json({
+            message: 'success'
+        }).status(200);
+    }).catch((err) => {
+        console.log('error deleteing reservation : ', util.inspect(err, utilOptions));
+        res.json({
+            message: 'error'
+        }).status(500);
+    });
+});
+
 
 module.exports = router;
