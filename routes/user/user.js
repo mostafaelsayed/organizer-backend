@@ -64,13 +64,14 @@ router.post('/register', function(req, res) {
 	let inputFirstName = req.body.firstName;
 	let inputLastName = req.body.lastName;
 	let inputPassword = req.body.password;
+	let inputPhoneNumber = req.body.phoneNumber;
 
 	bcrypt.genSalt(10, function(err1, salt) {
 		if (!err1) {
 			bcrypt.hash(inputPassword, salt, function(err2, hash) {
 				if (!err2) {
 					// Create a new user
-					User.create({ email: inputEmail, firstName: inputFirstName, lastName: inputLastName, passwordHash: hash }).then((user) => {
+					User.create({ email: inputEmail, firstName: inputFirstName, lastName: inputLastName, phoneNumber: inputPhoneNumber, passwordHash: hash }).then((user) => {
 						console.log("user's auto-generated ID:", user.id);
 						res.status(200).json({
 							message: 'success',
