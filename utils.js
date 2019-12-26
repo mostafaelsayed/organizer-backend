@@ -18,23 +18,34 @@ function verifyToken(req, res, next) {
 	}
 
 	if (req.url != '/api/register' && req.url != '/api/login') {
-		jwt.verify(token, secret, function(err, decoded) {
-			if (err) {
-				console.log('Failed to authenticate token..');
+		if (token === req.session.jwt) {
+			console.log('tokens are equal');
+			jwt.verify(token, secret, function(err, decoded) {
+				if (err) {
+					console.log('Failed to authenticate token..');
 
-				return res.status(403).send({
-					// success: false,
-					message: 'Failed to authenticate token'
-				});
-			}
-			else {
-				console.log('verified token : ', util.inspect(decoded, utilOptions));
-
-				if (decoded && decoded.email) {
-					return next();
+					return res.status(403).send({
+						// success: false,
+						message: 'Failed to authenticate token'
+					});
 				}
-			}
-		});
+				else {
+					console.log('verified token : ', util.inspect(decoded, utilOptions));
+
+					if (decoded && decoded.email) {
+						return next();
+					}
+				}
+			});
+		}
+		else {
+			console.log('Failed to authenticate token..');
+
+			return res.status(403).send({
+				// success: false,
+				message: 'Failed to authenticate token'
+			});
+		}
 	}
 	else {
 		return next();

@@ -25,6 +25,7 @@ router.post('/login', function(req, res) {
 				console.log("user found :", util.inspect(user, utilOptions));
 				let jwt = utils.getToken(inputEmail);
 				req.session.user = user;
+				req.session.jwt = jwt;
 				
 				req.session.save((err) => {
 					if (err) {
