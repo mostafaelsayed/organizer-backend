@@ -101,6 +101,7 @@ router.post('/register', function(req, res) {
 
 router.get('/logout', function(req, res) {
 	req.session.user = undefined;
+	req.session.jwt = undefined;
 
 	res.send('success');
 });
