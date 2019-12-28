@@ -2,23 +2,18 @@ const router = require('express').Router();
 const Reservation = require('../../models/reservation/reservation');
 const util = require('../../config').util;
 const utilOptions = require('../../config').utilOptions;
+const errorResponses = require('../../models/response/error');
+const SuccessResponse = require('../../models/response/success');
 
-
-router.get('/getAll', function(req, res) {
-    console.log('req.session.user : ', util.inspect(req.session.user, utilOptions));
+router.get('/getAll', function(req, res) {    
     Reservation.findAll({ where: { userId: req.session.user.id } }).then((reservations) => {
         if (reservations[0]) {
             console.log('success get reservations : ', reservations[0].dataValues);
-            res.json({
-                message: 'success',
-                reservations: reservations.map((e) => {return e.dataValues;})
-            }).status(200);
+            reservations = reservations.map((e) => {return e.dataValues;})
+            new SuccessResponse('getting reservations', {reservations}).sendResponse(res);
         }
         else {
-            res.json({
-                message: 'not found',
-                reservations: []
-            }).status(404);
+            new errorResponses.NotFound('getting reservations').sendResponse(res);
         }
     });
 });
@@ -26,45 +21,31 @@ router.get('/getAll', function(req, res) {
 router.get('/get/:id', function(req, res) {
     Reservation.findOne({where: {id: req.params.id}}).then((success) => {
         console.log('success get reservation : ', util.inspect(success, utilOptions));
-        res.json({
-            message: 'success',
-            reservation: success.dataValues
-        }).status(200);
+        new SuccessResponse('getting one reservation', {reservation: success.dataValues}).sendResponse(res);
     }).catch((err) => {
         console.error('error get reservation : ', util.inspect(err, utilOptions));
-        res.json({
-            message: 'error'
-        }).status(500);
+        new errorResponses.InternalError('getting one reservation').sendResponse(res);
     });
 });
 
 router.post('/add', function(req, res) {
     Reservation.create({name: req.body.reservation.name, userId: req.body.userId}).then((success) => {
         console.log('success add reservation : ', util.inspect(success, utilOptions));
-        res.json({
-            message: 'success'
-        }).status(200);
+        new SuccessResponse('adding one reservation').sendResponse(res);
     }).catch((err) => {
         console.error('error creating reservation : ', util.inspect(err, utilOptions));
-        res.json({
-            message: 'error'
-        }).status(500);
+        new errorResponses.InternalError('adding one reservation').sendResponse(res);
     })
 });
 
 router.post('/delete', function(req, res) {
     Reservation.destroy({where: {id: req.body.reservationId}}).then((success) => {
         console.log('success delete reservation : ', util.inspect(success, utilOptions));
-        res.json({
-            message: 'success'
-        }).status(200);
+        new SuccessResponse('deleting one reservation').sendResponse(res);
     }).catch((err) => {
         console.log('error deleteing reservation : ', util.inspect(err, utilOptions));
-        res.json({
-            message: 'error'
-        }).status(500);
+        new errorResponses.InternalError('deleting one reservation').sendResponse(res);
     });
 });
-
 
 module.exports = router;
