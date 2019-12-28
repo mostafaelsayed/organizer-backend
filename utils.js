@@ -2,10 +2,10 @@ const jwt = require('jsonwebtoken');
 const util = require('./config').util;
 const utilOptions = require('./config').utilOptions;
 const secret = require('./config').secret;
+const NotAuthenticatedResponse = require('./models/response/error').NotAuthenticatedResponse;
 
-
-function getToken(email) {
-	return jwt.sign({email: email}, secret, { expiresIn: 24*60*60 });
+function getToken(email, id) {
+	return jwt.sign({email, id}, secret, { expiresIn: 24*60*60 });
 }
 
 function verifyToken(req, res, next) {
@@ -18,34 +18,20 @@ function verifyToken(req, res, next) {
 	}
 
 	if (req.url != '/api/register' && req.url != '/api/login') {
-		if (token === req.session.jwt) {
-			console.log('tokens are equal');
-			jwt.verify(token, secret, function(err, decoded) {
-				if (err) {
-					console.log('Failed to authenticate token..');
+		jwt.verify(token, secret, function(err, decoded) {
+			if (err) {
+				console.log('Failed to authenticate token..');
+				return new NotAuthenticatedResponse('verify token').sendResponse(res);
+			}
+			else {
+				console.log('token is verified : ', util.inspect(decoded, utilOptions));
 
-					return res.status(403).send({
-						// success: false,
-						message: 'Failed to authenticate token'
-					});
+				if (decoded && decoded.email) {
+					res.locals.user = decoded; // store the user that made the request in the res locals
+					return next();
 				}
-				else {
-					console.log('verified token : ', util.inspect(decoded, utilOptions));
-
-					if (decoded && decoded.email) {
-						return next();
-					}
-				}
-			});
-		}
-		else {
-			console.log('Failed to authenticate token..');
-
-			return res.status(403).send({
-				// success: false,
-				message: 'Failed to authenticate token'
-			});
-		}
+			}
+		});
 	}
 	else {
 		return next();
@@ -53,6 +39,6 @@ function verifyToken(req, res, next) {
 }
 
 module.exports = {
-    getToken: getToken,
-    verifyToken: verifyToken
+    getToken,
+    verifyToken
 };

@@ -24,36 +24,38 @@ router.post('/login', function(req, res) {
 
 		bcrypt.compare(inputPassword, hash, function(err3, res2) {
 			if (!err3 && res2 === true) {
-				console.log("user found :", util.inspect(user, utilOptions));
-
-				let jwt = utils.getToken(inputEmail);
-				req.session.user = user;
-				req.session.jwt = jwt;
+				console.log("success logging user in");
+				let jwt = utils.getToken(inputEmail, user.id);
+				//req.session.user = user;
 				
-				req.session.save((err) => {
-					if (err) {
-						console.log('user session not saved : ', err);
-					}
-				});
-
+				// req.session.save((err) => {
+				// 	if (err) {
+				// 		console.log('user session not saved : ', err);
+				// 		new errorResponses.InternalErrorResponse('login').sendResponse(res);
+				// 	}
+				// 	else {
+				// 		console.log('after login user session : ', util.inspect(req.session.user, utilOptions));
+				// 		new SuccessResponse('login', {user, jwt}).sendResponse(res);
+				// 	}
+				// });
 				console.log('after login user session : ', util.inspect(req.session.user, utilOptions));
 				new SuccessResponse('login', {user, jwt}).sendResponse(res);
 			}
 			else {
 				console.log('error compare password when log user in : ', err3);
-				new errorResponses.NotAuthenticated('login').sendResponse(res);
+				new errorResponses.NotAuthenticatedResponse('login').sendResponse(res);
 			}
 		});
 	}).catch((err) => {
 		console.log('error finding email when log user in : ', util.inspect(err, utilOptions));
-		new errorResponses.NotAuthenticated('login').sendResponse(res);
+		new errorResponses.NotAuthenticatedResponse('login').sendResponse(res);
 	});
 
 });
 
-router.get('/getUserInSession', function(req, res) {
-	new SuccessResponse('getting user session', {user: req.session.user}).sendResponse(res);
-});
+// router.get('/getUserInSession', function(req, res) {
+// 	new SuccessResponse('getting user session', {user: req.session.user}).sendResponse(res);
+// });
 
 router.post('/register', function(req, res) {
     console.log('req body register : ', util.inspect(req.body, utilOptions));
@@ -74,27 +76,27 @@ router.post('/register', function(req, res) {
 						
 					}).catch((err) => {
 						console.log('error register user : ', util.inspect(err, utilOptions));
-						new errorResponses.InternalError('register').sendResponse(res);
+						new errorResponses.InternalErrorResponse('register').sendResponse(res);
 					});
 				}
 				else {
 					console.log('error hashing password : ', util.inspect(err2, utilOptions));
-					new errorResponses.InternalError('register').sendResponse(res);
+					new errorResponses.InternalErrorResponse('register').sendResponse(res);
 				}
 			});
 		}
 		else {
 			console.log('error genSalt : ', util.inspect(err1, utilOptions));
-			new errorResponses.InternalError('registering user').sendResponse(res);
+			new errorResponses.InternalErrorResponse('registering user').sendResponse(res);
 		}
 	});
 });
 
-router.get('/logout', function(req, res) {
-	req.session.user = undefined;
-	req.session.jwt = undefined;
+// router.get('/logout', function(req, res) {
+// 	req.session.user = undefined;
+// 	req.session.jwt = undefined;
 
-	new SuccessResponse('logout').sendResponse(res);
-});
+// 	new SuccessResponse('logout').sendResponse(res);
+// });
 
 module.exports = router;

@@ -9,27 +9,27 @@ class ErrorResponse extends Response {
     }
 }
 
-class NotAuthenticated extends ErrorResponse {
+class NotAuthenticatedResponse extends ErrorResponse {
     constructor(action) {
         super(403, 'user not authenticated', action);
     }
 }
 
-class NotFound extends ErrorResponse {
+class NotFoundResponse extends ErrorResponse {
     constructor(action) {
         super(404, 'resource not found', action);
     }
 }
 
-class InternalError extends ErrorResponse {
+class InternalErrorResponse extends ErrorResponse {
     constructor(action) {
         super(500, 'internal server error', action);
     }
 }
 
 module.exports = {
-    ErrorResponse: ErrorResponse,
-    NotAuthenticated: NotAuthenticated,
-    NotFound: NotFound,
-    InternalError: InternalError
+    ErrorResponse,
+    NotAuthenticatedResponse,
+    NotFoundResponse,
+    InternalErrorResponse
 };
