@@ -1,4 +1,3 @@
-
 const bcrypt = require('bcryptjs');
 const User = require('../../models/user/user');
 const router = require('express').Router();
@@ -26,20 +25,7 @@ router.post('/login', function(req, res) {
 			if (!err3 && res2 === true) {
 				console.log("success logging user in");
 				let jwt = utils.getToken(inputEmail, user.id);
-				//req.session.user = user;
-				
-				// req.session.save((err) => {
-				// 	if (err) {
-				// 		console.log('user session not saved : ', err);
-				// 		new errorResponses.InternalErrorResponse('login').sendResponse(res);
-				// 	}
-				// 	else {
-				// 		console.log('after login user session : ', util.inspect(req.session.user, utilOptions));
-				// 		new SuccessResponse('login', {user, jwt}).sendResponse(res);
-				// 	}
-				// });
-				console.log('after login user session : ', util.inspect(req.session.user, utilOptions));
-				new SuccessResponse('login', {user, jwt}).sendResponse(res);
+				new SuccessResponse('login', {jwt}).sendResponse(res);
 			}
 			else {
 				console.log('error compare password when log user in : ', err3);
@@ -52,10 +38,6 @@ router.post('/login', function(req, res) {
 	});
 
 });
-
-// router.get('/getUserInSession', function(req, res) {
-// 	new SuccessResponse('getting user session', {user: req.session.user}).sendResponse(res);
-// });
 
 router.post('/register', function(req, res) {
     console.log('req body register : ', util.inspect(req.body, utilOptions));
@@ -91,12 +73,5 @@ router.post('/register', function(req, res) {
 		}
 	});
 });
-
-// router.get('/logout', function(req, res) {
-// 	req.session.user = undefined;
-// 	req.session.jwt = undefined;
-
-// 	new SuccessResponse('logout').sendResponse(res);
-// });
 
 module.exports = router;
