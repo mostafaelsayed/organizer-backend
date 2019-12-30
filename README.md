@@ -1,4 +1,4 @@
-# The Backend for the [Organizer Application]('https://the-organizer.herokuapp.com')
+# The Backend for the [Organizer Application](https://the-organizer.herokuapp.com)
 
 ## Changelog
 
