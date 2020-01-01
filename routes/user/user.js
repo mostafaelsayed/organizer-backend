@@ -6,6 +6,7 @@ const util = require('../../config').util;
 const utilOptions = require('../../config').utilOptions;
 const errorResponses = require('../../models/response/error');
 const SuccessResponse = require('../../models/response/success');
+const getUserInfo = require('../../utils').getUserInfo;
 
 router.post('/login', function(req, res) {
     console.log('req body login : ', util.inspect(req.body, utilOptions));
@@ -24,8 +25,8 @@ router.post('/login', function(req, res) {
 		bcrypt.compare(inputPassword, hash, function(err3, res2) {
 			if (!err3 && res2 === true) {
 				console.log("success logging user in");
-				let jwt = utils.getToken(inputEmail, user.id);
-				new SuccessResponse('login', {jwt}).sendResponse(res);
+				let token = utils.getToken(inputEmail, user.id);
+				new SuccessResponse('login', {token}).sendResponse(res);
 			}
 			else {
 				console.log('error compare password when log user in : ', err3);
@@ -69,9 +70,32 @@ router.post('/register', function(req, res) {
 		}
 		else {
 			console.log('error genSalt : ', util.inspect(err1, utilOptions));
-			new errorResponses.InternalErrorResponse('registering user').sendResponse(res);
+			new errorResponses.InternalErrorResponse('register').sendResponse(res);
 		}
 	});
 });
+
+router.get('/logout', function(req, res) {
+	if (req.user) {
+		User.findOne({where: {id: req.user.id}}).then((user) => {
+			user.update({facebook_access_token: ''}).then(() => {
+				console.log('success facebook logout');
+				req.logOut();
+				new SuccessResponse('logout').sendResponse(res);
+			}).catch((err) => {
+				console.log('error update when logout : ', util.inspect(err, utilOptions));
+				new errorResponses.InternalErrorResponse('logout').sendResponse(res);
+			});
+			
+		}).catch((err) => {
+			console.log('error findOne when logout : ', util.inspect(err, utilOptions));
+			new errorResponses.InternalErrorResponse('logout').sendResponse(res);
+		});
+	}
+	else {
+		console.log('success jwt logout');
+		new SuccessResponse('logout').sendResponse(res);
+	}
+})
 
 module.exports = router;

@@ -11,11 +11,9 @@ const User = dbConnection.define('users', {
   // },
   email: {
     type: Sequelize.STRING,
-    allowNull: false
   },
   firstName: {
     type: Sequelize.STRING,
-    allowNull: false
   },
   lastName: {
     type: Sequelize.STRING,
@@ -25,6 +23,12 @@ const User = dbConnection.define('users', {
     type: Sequelize.STRING,
   },
   passwordHash: {
+    type: Sequelize.STRING,
+  },
+  facebook_id: {
+    type: Sequelize.STRING,
+  },
+  facebook_access_token: {
     type: Sequelize.STRING,
   }
 },
