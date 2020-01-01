@@ -10,10 +10,8 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const clientId = process.env['FACEBOOK_CLIENT_ID'] ? process.env['FACEBOOK_CLIENT_ID'] : require('../secrets.json')['FACEBOOK_CLIENT_ID'];
 const clientSecret = process.env['FACEBOOK_CLIENT_SECRET'] ? process.env['FACEBOOK_CLIENT_SECRET'] : require('../secrets.json')['FACEBOOK_CLIENT_SECRET'];
 const redirectUrl = process.env.FACEBOOK_REDIRECT_URL ? process.env.FACEBOOK_REDIRECT_URL : 'http://localhost:4000/return/facebook';
-const request_url = process.env.FACEBOOK_REQUEST_URL ? process.env.FACEBOOK_REQUEST_URL : 'http://localhost:3000/success_login';
+const facebook_success_url = process.env.FACEBOOK_SUCCESS_URL ? process.env.FACEBOOK_SUCCESS_URL : 'http://localhost:3000/success_login';
 
-console.log('facebook clientId : ', clientId);
-console.log('facebook clientSecret : ', clientSecret);
 // pass app object to enable facebook authentication for the app
 module.exports = function(app) {
     passport.use(new FacebookStrategy({
@@ -121,8 +119,7 @@ module.exports = function(app) {
         return new errorResponses.InternalErrorResponse('facebook login').sendResponse(res);
     });
 
-
     app.get('/return/facebook', passport.authenticate('facebook', { failureRedirect: '/login_fail/facebook' }), function(req, res) {
-        res.redirect(`${request_url}`);
+        res.redirect(`${facebook_success_url}`);
     });
 };
