@@ -7,8 +7,8 @@ const expressSession = require('express-session');
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
 
-const clientId = process.env['FACEBOOK_CLIENT_ID'] ? process.env['FACEBOOK_CLIENT_ID'] : require('../secrets.json')['FACEBOOK_CLIENT_ID'];
-const clientSecret = process.env['FACEBOOK_CLIENT_SECRET'] ? process.env['FACEBOOK_CLIENT_SECRET'] : require('../secrets.json')['FACEBOOK_CLIENT_SECRET'];
+const clientId = process.env.FACEBOOK_CLIENT_ID ? process.env.FACEBOOK_CLIENT_ID : require('../secrets.json')['FACEBOOK_CLIENT_ID'];
+const clientSecret = process.env.FACEBOOK_CLIENT_SECRET ? process.env.FACEBOOK_CLIENT_SECRET : require('../secrets.json')['FACEBOOK_CLIENT_SECRET'];
 const redirectUrl = process.env.FACEBOOK_REDIRECT_URL ? process.env.FACEBOOK_REDIRECT_URL : 'http://localhost:4000/return/facebook';
 const facebook_success_url = process.env.FACEBOOK_SUCCESS_URL ? process.env.FACEBOOK_SUCCESS_URL : 'http://localhost:3000/success_login';
 
