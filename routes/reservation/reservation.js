@@ -50,7 +50,7 @@ router.post('/delete', function(req, res) {
         console.log('success delete reservation : ', util.inspect(success, utilOptions));
         new SuccessResponse('deleting one reservation').sendResponse(res);
     }).catch((err) => {
-        console.log('error deleteing reservation : ', util.inspect(err, utilOptions));
+        console.error('error deleteing reservation : ', util.inspect(err, utilOptions));
         new errorResponses.InternalErrorResponse('deleting one reservation').sendResponse(res);
     });
 });

@@ -29,12 +29,12 @@ router.post('/login', function(req, res) {
 				new SuccessResponse('login', {token}).sendResponse(res);
 			}
 			else {
-				console.log('error compare password when log user in : ', err3);
+				console.error('error compare password when log user in : ', err3);
 				new errorResponses.NotAuthenticatedResponse('login').sendResponse(res);
 			}
 		});
 	}).catch((err) => {
-		console.log('error finding email when log user in : ', util.inspect(err, utilOptions));
+		console.error('error finding email when log user in : ', util.inspect(err, utilOptions));
 		new errorResponses.NotAuthenticatedResponse('login').sendResponse(res);
 	});
 
@@ -58,18 +58,18 @@ router.post('/register', function(req, res) {
 						new SuccessResponse('register', {email: inputEmail}).sendResponse(res);
 						
 					}).catch((err) => {
-						console.log('error register user : ', util.inspect(err, utilOptions));
+						console.error('error register user : ', util.inspect(err, utilOptions));
 						new errorResponses.InternalErrorResponse('register').sendResponse(res);
 					});
 				}
 				else {
-					console.log('error hashing password : ', util.inspect(err2, utilOptions));
+					console.error('error hashing password : ', util.inspect(err2, utilOptions));
 					new errorResponses.InternalErrorResponse('register').sendResponse(res);
 				}
 			});
 		}
 		else {
-			console.log('error genSalt : ', util.inspect(err1, utilOptions));
+			console.error('error genSalt : ', util.inspect(err1, utilOptions));
 			new errorResponses.InternalErrorResponse('register').sendResponse(res);
 		}
 	});
@@ -83,12 +83,12 @@ router.get('/logout', function(req, res) {
 				req.logOut();
 				new SuccessResponse('logout').sendResponse(res);
 			}).catch((err) => {
-				console.log('error update when logout : ', util.inspect(err, utilOptions));
+				console.error('error update when logout : ', util.inspect(err, utilOptions));
 				new errorResponses.InternalErrorResponse('logout').sendResponse(res);
 			});
 			
 		}).catch((err) => {
-			console.log('error findOne when logout : ', util.inspect(err, utilOptions));
+			console.error('error findOne when logout : ', util.inspect(err, utilOptions));
 			new errorResponses.InternalErrorResponse('logout').sendResponse(res);
 		});
 	}

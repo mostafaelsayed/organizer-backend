@@ -21,9 +21,9 @@ module.exports = function(app) {
         profileFields: ['id', 'email', 'displayName', 'name']
     },
     function(accessToken, refreshToken, profile, cb) {
-        
-        console.log('facebook accessToken : ', accessToken);
-        console.log('facebook refreshToken : ', refreshToken);
+        console.log('getting facebook user profile and tokens');
+        //console.log('facebook accessToken : ', accessToken);
+        //console.log('facebook refreshToken : ', refreshToken);
         console.log('facebook profile : ', util.inspect(profile, utilOptions));
         // In this example, the user's Facebook profile is supplied as the user
         // record.  In a production-quality application, the Facebook profile should
@@ -36,13 +36,13 @@ module.exports = function(app) {
                 facebook_id: profile.id
             }
         }).then((user) => {
-            console.log('success find user login facebook');
+            console.log('success find user when login with facebook');
             if (user && user.dataValues && user.dataValues.id) {
                 user.update({facebook_access_token: accessToken}).then((success) => {
-                    console.log('success update user login facebook');
+                    console.log('success update user access token when login with facebook');
                     return cb(null, profile);
                 }).catch((errorUpdate) => {
-                    console.log('error update user login facebook : ', util.inspect(errorUpdate, utilOptions));
+                    console.log('error update user access token when login with facebook : ', util.inspect(errorUpdate, utilOptions));
                     return cb('error facebook login');
                 });
             }
@@ -54,15 +54,15 @@ module.exports = function(app) {
                     facebook_id: profile.id,
                     facebook_access_token: accessToken
                 }).then((successCreate) => {
-                    console.log('success create user login facebook');
+                    console.log('success create user when login with facebook');
                     return cb(null, profile);
                 }).catch((errorCreate) => {
-                    console.log('error create user login facebook : ', util.inspect(errorCreate, utilOptions));
+                    console.log('error create user when login with facebook : ', util.inspect(errorCreate, utilOptions));
                     return cb('error facebook login');
                 });
             }
         }).catch((errorFind) => {
-            console.log('error find user login facebook : ', util.inspect(errorFind, utilOptions));
+            console.log('error find user when login with facebook : ', util.inspect(errorFind, utilOptions));
             return cb('error facebook login');
         });
 
@@ -80,18 +80,18 @@ module.exports = function(app) {
     // example does not have a database, the complete Facebook profile is serialized
     // and deserialized.
     passport.serializeUser(function(user, cb) {
-        console.log('user when serialize : ', util.inspect(user, utilOptions));
+        console.log('facebook user when serialize : ', util.inspect(user, utilOptions));
         cb(null, user.id);
     });
 
     passport.deserializeUser(function(id, cb) {
-        console.log('id when deserialize : ', util.inspect(id, utilOptions));
+        console.log('facebook user id when deserialize : ', util.inspect(id, utilOptions));
 
         User.findOne({where: {facebook_id: id}}).then((success) => {
-            console.log('success get facebook user : ', util.inspect(success.dataValues, utilOptions));
+            console.log('success get facebook user when deserialize : ', util.inspect(success.dataValues, utilOptions));
             cb(null, success.dataValues);
         }).catch((err) => {
-            console.log('error get facebook user : ', util.inspect(err, utilOptions));
+            console.log('error get facebook user when deserialize : ', util.inspect(err, utilOptions));
             cb('error authenticate facebook user');
         });
     });
@@ -112,14 +112,17 @@ module.exports = function(app) {
     app.use(passport.session());
 
     app.get('/login/facebook', function(req, res) {
+        console.log('inside login/facebook');
         res.send(`https://www.facebook.com/v3.2/dialog/oauth?response_type=code&redirect_uri=${redirectUrl}&client_id=${clientId}`);
     });
 
     app.get('/login_fail/facebook', function(req, res) {
+        console.log('inside login_fail/facebook');
         return new errorResponses.InternalErrorResponse('facebook login').sendResponse(res);
     });
 
     app.get('/return/facebook', passport.authenticate('facebook', { failureRedirect: '/login_fail/facebook' }), function(req, res) {
+        console.log('inside return/facebook');
         res.redirect(`${facebook_success_url}`);
     });
 };
