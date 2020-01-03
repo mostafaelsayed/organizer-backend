@@ -52,13 +52,16 @@ router.post('/register', function(req, res) {
 		if (!err1) {
 			bcrypt.hash(inputPassword, salt, function(err2, hash) {
 				if (!err2) {
-					// Create a new user
-					User.create({ email: inputEmail, firstName: inputFirstName, lastName: inputLastName, phoneNumber: inputPhoneNumber, passwordHash: hash }).then((user) => {
-						console.log("success register user : ", util.inspect(user, utilOptions));
-						mailHelper.sendMail('mostafaelsayed9419@gmail.com', inputEmail);
-						new SuccessResponse('register', {token: utils.getToken(inputEmail, user.dataValues.id)}).sendResponse(res);
+					mailHelper.sendMail('mostafaelsayed9419@gmail.com', inputEmail).then((success) => {
+						// Create a new user
+						User.create({ email: inputEmail, firstName: inputFirstName, lastName: inputLastName, phoneNumber: inputPhoneNumber, passwordHash: hash }).then((user) => {
+							console.log("success register user : ", util.inspect(user, utilOptions));
+							new SuccessResponse('register', {token: utils.getToken(inputEmail, user.dataValues.id)}).sendResponse(res);
+						}).catch((err) => {
+							console.error('error register user : ', util.inspect(err, utilOptions));
+							new errorResponses.InternalErrorResponse('register').sendResponse(res);
+						});
 					}).catch((err) => {
-						console.error('error register user : ', util.inspect(err, utilOptions));
 						new errorResponses.InternalErrorResponse('register').sendResponse(res);
 					});
 				}
