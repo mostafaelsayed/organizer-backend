@@ -6,7 +6,7 @@ const util = require('../../config').util;
 const utilOptions = require('../../config').utilOptions;
 const errorResponses = require('../../models/response/error');
 const SuccessResponse = require('../../models/response/success');
-const getUserInfo = require('../../utils').getUserInfo;
+const mailHelper = require('../../helpers/mail');
 
 router.post('/login', function(req, res) {
     console.log('req body login : ', util.inspect(req.body, utilOptions));
@@ -55,8 +55,8 @@ router.post('/register', function(req, res) {
 					// Create a new user
 					User.create({ email: inputEmail, firstName: inputFirstName, lastName: inputLastName, phoneNumber: inputPhoneNumber, passwordHash: hash }).then((user) => {
 						console.log("success register user : ", util.inspect(user, utilOptions));
-						new SuccessResponse('register', {email: inputEmail}).sendResponse(res);
-						
+						mailHelper.sendMail('mostafaelsayed9419@gmail.com', inputEmail);
+						new SuccessResponse('register', {token: utils.getToken(inputEmail, user.dataValues.id)}).sendResponse(res);
 					}).catch((err) => {
 						console.error('error register user : ', util.inspect(err, utilOptions));
 						new errorResponses.InternalErrorResponse('register').sendResponse(res);
