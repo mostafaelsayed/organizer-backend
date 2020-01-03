@@ -3,6 +3,7 @@ const util = require('../config').util;
 const utilOptions = require('../config').utilOptions;
 
 
+
 // ---------------------- @sendgrid/mail ----------------------- //
 
 // // using Twilio SendGrid's v3 Node.js Library
@@ -35,6 +36,8 @@ const utilOptions = require('../config').utilOptions;
 // ------------------ nodemailer ------------------------ //
 
 const nodemailer = require("nodemailer");
+const User = require('../models/user/user');
+const mailConfirmedRedirectUrl = process.env.MAIL_CONFIRMED_REDIRECT_URL ? process.env.MAIL_CONFIRMED_REDIRECT_URL : require('../secrets').MAIL_CONFIRMED_REDIRECT_URL;
 
 // Generate test SMTP service account from ethereal.email
 // Only needed if you don't have a real mail account for testing
@@ -55,24 +58,32 @@ let transporter = nodemailer.createTransport({
 module.exports = {
     sendMail: function(from, to, subject, text, html) {
         return new Promise((resolve, reject) => {
-            // send mail with defined transport object
-            transporter.sendMail({
-                from,
-                to,
-                subject: subject ? subject : "Hello to the organizer ✔", // Subject line
-                text: text ? text : "Hello world?", // plain text body
-                html: html ? html : "<b>Hello world?</b>" // html body
-            }).then((success) => {
-                console.log('success send mail with nodemailer : ');
-                resolve('success send mail');
-            }).catch((err) => {
-                console.error('error send mail with nodemailer : ', util.inspect(err, utilOptions));
-                reject('error send mail');
+            User.findOne({
+                where: {
+                    email: to
+                }
+            }).then((user) => {
+                console.log('success find user when sendmail');
+                
+                transporter.sendMail({
+                    from,
+                    to,
+                    subject: subject ? subject : "Hello to the organizer ✔", // Subject line
+                    text: text ? text : "Hello world?", // plain text body
+                    html: html ? html : `<b>Hello . please click on <a href="${mailConfirmedRedirectUrl}?code=${user.dataValues.email_verification_code}">this link</a> to confirm</b>` // html body
+                }).then((success) => {
+                    console.log('success send email with nodemailer : ');
+                    resolve('success send email');
+                }).catch((err) => {
+                    console.error('error send email with nodemailer : ', util.inspect(err, utilOptions));
+                    res.redirect(process.env.MAIL_CONFIRMED_ERROR_REDIRECT_URL ? process.env.MAIL_CONFIRMED_ERROR_REDIRECT_URL : require('./secrets.json').MAIL_CONFIRMED_ERROR_REDIRECT_URL);
+                    reject('error send mail');
+                });
+                
+            }).catch((errorFind) => {
+                console.log('error find user when send email with nodemailer : ', util.inspect(errorFind, utilOptions));
+                return cb('error verify email');
             });
-
-            // Preview only available when sending through an Ethereal account
-            //console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-            // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
         });
     }
 };

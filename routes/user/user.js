@@ -7,6 +7,7 @@ const utilOptions = require('../../config').utilOptions;
 const errorResponses = require('../../models/response/error');
 const SuccessResponse = require('../../models/response/success');
 const mailHelper = require('../../helpers/mail');
+const uuidv1 = require('uuid/v1');
 
 router.post('/login', function(req, res) {
     console.log('req body login : ', util.inspect(req.body, utilOptions));
@@ -52,18 +53,22 @@ router.post('/register', function(req, res) {
 		if (!err1) {
 			bcrypt.hash(inputPassword, salt, function(err2, hash) {
 				if (!err2) {
-					mailHelper.sendMail('mostafaelsayed9419@gmail.com', inputEmail).then((success) => {
-						// Create a new user
-						User.create({ email: inputEmail, firstName: inputFirstName, lastName: inputLastName, phoneNumber: inputPhoneNumber, passwordHash: hash }).then((user) => {
+					// Create a new user
+					let code = uuidv1();
+					console.log('code to send in mail : ', code);
+					User.create({ email: inputEmail, firstName: inputFirstName, lastName: inputLastName, phoneNumber: inputPhoneNumber, passwordHash: hash, email_verification_code: code }).then((user) => {
+						mailHelper.sendMail('mostafaelsayed9419@gmail.com', inputEmail).then((success) => {
 							console.log("success register user : ", util.inspect(user, utilOptions));
 							new SuccessResponse('register', {token: utils.getToken(inputEmail, user.dataValues.id)}).sendResponse(res);
 						}).catch((err) => {
-							console.error('error register user : ', util.inspect(err, utilOptions));
 							new errorResponses.InternalErrorResponse('register').sendResponse(res);
 						});
+							
 					}).catch((err) => {
+						console.error('error register user : ', util.inspect(err, utilOptions));
 						new errorResponses.InternalErrorResponse('register').sendResponse(res);
 					});
+						
 				}
 				else {
 					console.error('error hashing password : ', util.inspect(err2, utilOptions));

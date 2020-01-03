@@ -30,6 +30,12 @@ const User = dbConnection.define('users', {
   },
   facebook_access_token: {
     type: Sequelize.STRING,
+  },
+  email_verified: {
+    type: Sequelize.TINYINT,
+  },
+  email_verification_code: {
+    type: Sequelize.STRING,
   }
 },
 {
