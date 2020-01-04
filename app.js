@@ -32,7 +32,7 @@ app.use('/api/reservation', verifyToken);
 
 app.use('/api/reservation', reservationRouter);
 
-app.get('/mail_confirmed', function(req, res) {
+app.get('/confirm_email', function(req, res) {
     let code = req.query.code;
     User.findOne({
         where: {
@@ -44,7 +44,7 @@ app.get('/mail_confirmed', function(req, res) {
             email_verification_code: null
         }).then((success) => {
             console.log('success confirm email');            
-            res.redirect(process.env.MAIL_CONFIRMED_SUCCESS_REDIRECT_URL ? process.env.MAIL_CONFIRMED_SUCCESS_REDIRECT_URL : require('./secrets.json').MAIL_CONFIRMED_SUCCESS_REDIRECT_URL);
+            res.redirect(process.env.EMAIL_CONFIRMATION_SUCCESS_REDIRECT_URL ? process.env.EMAIL_CONFIRMATION_SUCCESS_REDIRECT_URL : require('./secrets.json').EMAIL_CONFIRMATION_SUCCESS_REDIRECT_URL);
         }).catch((err) => {
             console.error('error update user when confirm email : ', util.inspect(err, utilOptions));
             return new errorResponses.InternalErrorResponse('confirm email').sendResponse(res);

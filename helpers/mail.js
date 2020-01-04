@@ -37,7 +37,7 @@ const utilOptions = require('../config').utilOptions;
 
 const nodemailer = require("nodemailer");
 const User = require('../models/user/user');
-const mailConfirmedRedirectUrl = process.env.MAIL_CONFIRMED_REDIRECT_URL ? process.env.MAIL_CONFIRMED_REDIRECT_URL : require('../secrets').MAIL_CONFIRMED_REDIRECT_URL;
+const mailConfirmedRedirectUrl = process.env.EMAIL_CONFIRMATION_REDIRECT_URL ? process.env.EMAIL_CONFIRMATION_REDIRECT_URL : require('../secrets').EMAIL_CONFIRMATION_REDIRECT_URL;
 
 // Generate test SMTP service account from ethereal.email
 // Only needed if you don't have a real mail account for testing
@@ -76,7 +76,7 @@ module.exports = {
                     resolve('success send email');
                 }).catch((err) => {
                     console.error('error send email with nodemailer : ', util.inspect(err, utilOptions));
-                    res.redirect(process.env.MAIL_CONFIRMED_ERROR_REDIRECT_URL ? process.env.MAIL_CONFIRMED_ERROR_REDIRECT_URL : require('./secrets.json').MAIL_CONFIRMED_ERROR_REDIRECT_URL);
+                    res.redirect(process.env.EMAIL_CONFIRMATION_ERROR_REDIRECT_URL ? process.env.EMAIL_CONFIRMATION_ERROR_REDIRECT_URL : require('./secrets.json').EMAIL_CONFIRMATION_ERROR_REDIRECT_URL);
                     reject('error send mail');
                 });
                 
