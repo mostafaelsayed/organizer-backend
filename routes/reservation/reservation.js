@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const Reservation = require('../../models/reservation/reservation');
+const Reservation = require('../../database/models/index').Reservation;
 const util = require('../../config').util;
 const utilOptions = require('../../config').utilOptions;
 const errorResponses = require('../../models/response/error');
@@ -37,12 +37,12 @@ router.get('/get/:id', function(req, res) {
 
 router.post('/add', function(req, res) {
     Reservation.create({name: req.body.reservation.name, userId: getUserInfo(req, res).id}).then((success) => {
-        console.log('success add reservation : ', util.inspect(success, utilOptions));
+        console.log('success add reservation : ', util.inspect(success.dataValues, utilOptions));
         new SuccessResponse('adding one reservation').sendResponse(res);
     }).catch((err) => {
         console.error('error creating reservation : ', util.inspect(err, utilOptions));
         new errorResponses.InternalErrorResponse('adding one reservation').sendResponse(res);
-    })
+    });
 });
 
 router.post('/delete', function(req, res) {

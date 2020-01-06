@@ -1,4 +1,4 @@
-const User = require('../models/user/user');
+const User = require('../database/models/index').User;
 const util = require('../config').util;
 const utilOptions = require('../config').utilOptions;
 const errorResponses = require('../models/response/error');

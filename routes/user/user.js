@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const User = require('../../models/user/user');
+const User = require('../../database/models/index').User;
 const router = require('express').Router();
 const utils = require('../../utils');
 const util = require('../../config').util;
@@ -61,6 +61,7 @@ router.post('/register', function(req, res) {
 							console.log("success register user : ", util.inspect(user, utilOptions));
 							new SuccessResponse('register', {token: utils.getToken(inputEmail, user.dataValues.id)}).sendResponse(res);
 						}).catch((err) => {
+							console.log('error send mail : ', util.inspect(err, utilOptions));
 							new errorResponses.InternalErrorResponse('register').sendResponse(res);
 						});
 							
@@ -104,6 +105,6 @@ router.get('/logout', function(req, res) {
 		console.log('success jwt logout');
 		new SuccessResponse('logout').sendResponse(res);
 	}
-})
+});
 
 module.exports = router;

@@ -1,5 +1,5 @@
 const utilOptions = { depth: null };
-const dbConnection = require('./database/connection');
+//const dbConnection = require('./database/connection');
 const util = require('util');
 
 // global.utilOptions = utilOptions;
@@ -9,7 +9,7 @@ const util = require('util');
 
 module.exports = {
     utilOptions: utilOptions,
-    dbConnection: dbConnection,
+    //dbConnection: dbConnection,
     util: util,
     port: process.env.PORT || 4000,
     secret: process.env.SECRET || '987fdgo1z09qjla0934lksdp0',

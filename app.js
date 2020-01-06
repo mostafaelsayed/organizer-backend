@@ -7,7 +7,7 @@ const userRouter = require('./routes/user/user');
 const reservationRouter = require('./routes/reservation/reservation');
 const app = express();
 const errorResponses = require('./models/response/error');
-const User = require('./models/user/user');
+const User = require('./database/models/index').User;
 const util = require('./config').util;
 const utilOptions = require('./config').utilOptions;
 
@@ -44,7 +44,7 @@ app.get('/confirm_email', function(req, res) {
             email_verification_code: null
         }).then((success) => {
             console.log('success confirm email');            
-            res.redirect(process.env.EMAIL_CONFIRMATION_SUCCESS_REDIRECT_URL ? process.env.EMAIL_CONFIRMATION_SUCCESS_REDIRECT_URL : require('./secrets.json').EMAIL_CONFIRMATION_SUCCESS_REDIRECT_URL);
+            res.redirect(process.env.EMAIL_CONFIRMATION_SUCCESS_REDIRECT_URL || require('./secrets.json').EMAIL_CONFIRMATION_SUCCESS_REDIRECT_URL);
         }).catch((err) => {
             console.error('error update user when confirm email : ', util.inspect(err, utilOptions));
             return new errorResponses.InternalErrorResponse('confirm email').sendResponse(res);
