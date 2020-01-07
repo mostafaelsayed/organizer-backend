@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
   const Reservation = sequelize.define('Reservation', {
     name: DataTypes.STRING,
     userId: DataTypes.INTEGER,
-    createdAt: DataTypes.DateTime
+    createdAt: DataTypes.DATE
   }, {
     timestamps: false
   });
