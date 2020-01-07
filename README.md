@@ -5,9 +5,9 @@
 ### Done
 
 * add support for oauth authentication using facebook locally
+* make migration to update reservations table (add "createdAt" column and add foreign constrain "on delete cascade")
 
 ### Not Done
 
-* make migration to update tables (add column and add foreign constrain "cascade")
 * add support for oauth authentication using facebook in remote server
 * add support for oauth authentication using google

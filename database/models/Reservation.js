@@ -2,7 +2,8 @@
 module.exports = (sequelize, DataTypes) => {
   const Reservation = sequelize.define('Reservation', {
     name: DataTypes.STRING,
-    userId: DataTypes.INTEGER
+    userId: DataTypes.INTEGER,
+    createdAt: DataTypes.DateTime
   }, {
     timestamps: false
   });
