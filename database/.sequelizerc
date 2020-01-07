@@ -1,6 +1,6 @@
 const path = require('path');
 
 module.exports = {
-  'config': path.resolve('config', 'config.js'),
+  'config': path.resolve('/database/econfig', 'config.js'),
   'env': process.env.ENV || 'local'
 }
