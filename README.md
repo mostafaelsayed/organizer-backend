@@ -2,4 +2,12 @@
 
 ## Changelog
 
-* add support for oauth authentication using facebook
+### Done
+
+* add support for oauth authentication using facebook locally
+
+### Not Done
+
+* make migration to update tables (add column and add foreign constrain "cascade")
+* add support for oauth authentication using facebook in remote server
+* add support for oauth authentication using google
