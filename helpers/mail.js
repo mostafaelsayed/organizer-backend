@@ -35,68 +35,25 @@ const utilOptions = require('../config').utilOptions;
 
 // ------------------ nodemailer ------------------------ //
 
-const nodemailer = require("nodemailer");
-const User = require('../database/models/index').User;
-const emailConfirmationRedirectUrl = process.env.EMAIL_CONFIRMATION_REDIRECT_URL || require('../secrets').EMAIL_CONFIRMATION_REDIRECT_URL;
-
-// Generate test SMTP service account from ethereal.email
-// Only needed if you don't have a real mail account for testing
-//let testAccount = await nodemailer.createTestAccount();
-
-// create reusable transporter object using the default SMTP transport
-let transporter = nodemailer.createTransport({
-    host: "smtp.mailgun.org",
-    port: process.env.MAILGUN_DOMAIN_USERNAME ? 465 : 587,
-    //port: 465,
-    secure: process.env.MAILGUN_DOMAIN_USERNAME ? true : false, // true for 465, false for other ports
-    auth: {
-        user: process.env.MAILGUN_DOMAIN_USERNAME || require('../secrets.json').MAILGUN_DOMAIN_USERNAME,
-        pass: process.env.MAILGUN_DOMAIN_PASSWORD || require('../secrets.json').MAILGUN_DOMAIN_PASSWORD,
-    }
-});
-
-module.exports = {
-    sendMail: function(from, to, subject, text, html) {
-        return new Promise((resolve, reject) => {
-            User.findOne({
-                where: {
-                    email: to
-                }
-            }).then((user) => {
-                console.log('success find user when sendmail');
-                
-                transporter.sendMail({
-                    from,
-                    to,
-                    subject: subject || "Hello to the organizer ✔", // Subject line
-                    text: text || "Hello world?", // plain text body
-                    html: html || `<b>Hello . please click on <a href="${emailConfirmationRedirectUrl}?code=${user.dataValues.email_verification_code}">this link</a> to confirm</b>` // html body
-                }).then((success) => {
-                    console.log('success send email with nodemailer : ');
-                    resolve('success send email');
-                }).catch((err) => {
-                    console.error('error send email with nodemailer : ', util.inspect(err, utilOptions));
-                    res.redirect(process.env.EMAIL_CONFIRMATION_ERROR_REDIRECT_URL || require('./secrets.json').EMAIL_CONFIRMATION_ERROR_REDIRECT_URL);
-                    reject('error send mail');
-                });
-                
-            }).catch((errorFind) => {
-                console.log('error find user when send email with nodemailer : ', util.inspect(errorFind, utilOptions));
-                return cb('error verify email');
-            });
-        });
-    }
-};
-
-
-// ---------------- mailgun-js --------------- //
-
-// var domain = process.env.MAILGUN_DOMAIN || require('../secrets.json').MAILGUN_DOMAIN;
-// var apiKey = process.env.MAILGUN_API_KEY || require('../secrets.json').MAILGUN_API_KEY
-// var MailComposer = require('nodemailer/lib/mail-composer');
-// var mailgun = require('mailgun-js')({apiKey, domain});
+// const nodemailer = require("nodemailer");
 // const User = require('../database/models/index').User;
 // const emailConfirmationRedirectUrl = process.env.EMAIL_CONFIRMATION_REDIRECT_URL || require('../secrets').EMAIL_CONFIRMATION_REDIRECT_URL;
+
+// // Generate test SMTP service account from ethereal.email
+// // Only needed if you don't have a real mail account for testing
+// //let testAccount = await nodemailer.createTestAccount();
+
+// // create reusable transporter object using the default SMTP transport
+// let transporter = nodemailer.createTransport({
+//     host: "smtp.mailgun.org",
+//     port: process.env.MAILGUN_DOMAIN_USERNAME ? 465 : 587,
+//     //port: 465,
+//     secure: process.env.MAILGUN_DOMAIN_USERNAME ? true : false, // true for 465, false for other ports
+//     auth: {
+//         user: process.env.MAILGUN_DOMAIN_USERNAME || require('../secrets.json').MAILGUN_DOMAIN_USERNAME,
+//         pass: process.env.MAILGUN_DOMAIN_PASSWORD || require('../secrets.json').MAILGUN_DOMAIN_PASSWORD,
+//     }
+// });
 
 // module.exports = {
 //     sendMail: function(from, to, subject, text, html) {
@@ -106,50 +63,77 @@ module.exports = {
 //                     email: to
 //                 }
 //             }).then((user) => {
-//                 console.log('from mail : ', from);
-//                 console.log('to mail : ', to);
-
-//                 const msg = {
-//                     to,
+//                 console.log('success find user when sendmail');
+                
+//                 transporter.sendMail({
 //                     from,
-//                     subject: subject || 'Welcome to the organizer',
-//                     text: text || 'we are glad you are here',
-//                     html: html || `<b>Hello . please click on <a href="${emailConfirmationRedirectUrl}?code=${user.dataValues.email_verification_code}">this link</a> to confirm</b>` // html body
-//                 };
-
-//                 const data = {
 //                     to,
-//                     message: 'welcome'
-//                 }
-
-//                 var mail = new MailComposer(msg);
-
-//                 console.log('email msf object to send mailgun : ', util.inspect(msg, utilOptions));
-
-//                 mail.compile().build((err, message) => {
-//                     if (!err) {
-//                         console.log('success compile mime when send mail with mailgun');
-//                         mailgun.messages().sendMime(data, function (error, body) {
-//                             if (!error) {
-//                                 console.log('success send mail with mailgun');
-//                                 resolve('success send email');
-//                             }
-//                             else {
-//                                 console.error('error send mail with mailgun : ', util.inspect(error, utilOptions));
-//                                 reject(error);
-//                             }
-//                         });
-//                     }
-//                     else {
-//                         console.error('error compile mime when send mail with mailgun');
-//                         reject(err);
-//                     }
+//                     subject: subject || "Hello to the organizer ✔", // Subject line
+//                     text: text || "Hello world?", // plain text body
+//                     html: html || `<b>Hello . please click on <a href="${emailConfirmationRedirectUrl}?code=${user.dataValues.email_verification_code}">this link</a> to confirm</b>` // html body
+//                 }).then((success) => {
+//                     console.log('success send email with nodemailer : ');
+//                     resolve('success send email');
+//                 }).catch((err) => {
+//                     console.error('error send email with nodemailer : ', util.inspect(err, utilOptions));
+//                     res.redirect(process.env.EMAIL_CONFIRMATION_ERROR_REDIRECT_URL || require('./secrets.json').EMAIL_CONFIRMATION_ERROR_REDIRECT_URL);
+//                     reject('error send mail');
 //                 });
-                    
-//             }).catch((err) => {
-//                 console.error('error find user when send mail with mailgun : ', util.inspect(err, utilOptions));
-//                 reject(err);
-//             })
+                
+//             }).catch((errorFind) => {
+//                 console.log('error find user when send email with nodemailer : ', util.inspect(errorFind, utilOptions));
+//                 return cb('error verify email');
+//             });
 //         });
 //     }
-// }
+// };
+
+
+// ---------------- mailgun-js --------------- //
+
+var domain = process.env.MAILGUN_DOMAIN || require('../secrets.json').MAILGUN_DOMAIN;
+var apiKey = process.env.MAILGUN_API_KEY || require('../secrets.json').MAILGUN_API_KEY
+var mailgun = require('mailgun-js')({apiKey, domain});
+const User = require('../database/models/index').User;
+const emailConfirmationRedirectUrl = process.env.EMAIL_CONFIRMATION_REDIRECT_URL || require('../secrets').EMAIL_CONFIRMATION_REDIRECT_URL;
+
+module.exports = {
+    sendMail: function(from, to, subject, text, html) {
+        return new Promise((resolve, reject) => {
+            User.findOne({
+                where: {
+                    email: to
+                }
+            }).then((user) => {
+                console.log('from mail : ', from);
+                console.log('to mail : ', to);
+
+                var data = {
+                    from,
+                    to,
+                    //cc: 'baz@example.com',
+                    //bcc: 'bar@example.com',
+                    subject: subject || 'Welcome to the organizer application',
+                    text: text || 'we are glad you are here',
+                    html: html || `<b>Hello . please click on <a href="${emailConfirmationRedirectUrl}?code=${user.dataValues.email_verification_code}">this link</a> to confirm</b>`, // html body
+                    //attachment: filepath
+                };
+                
+                mailgun.messages().send(data, function (error, body) {
+                    if (!error) {
+                        console.log('success send email with mailgun');
+                        resolve('success send email');
+                    }
+                    else {
+                        console.error('error send email with mailgun : ', util.inspect(error, utilOptions));
+                        reject(error);
+                    }
+                });
+                    
+            }).catch((err) => {
+                console.error('error find user when send mail with mailgun : ', util.inspect(err, utilOptions));
+                reject(err);
+            });
+        });
+    }
+};

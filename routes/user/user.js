@@ -58,7 +58,7 @@ router.post('/register', function(req, res) {
 					console.log('code to send in mail : ', code);
 					User.create({ email: inputEmail, firstName: inputFirstName, lastName: inputLastName, phoneNumber: inputPhoneNumber, passwordHash: hash, email_verification_code: code }).then((user) => {
 						mailHelper.sendMail('mostafaelsayed9419@gmail.com', inputEmail).then((success) => {
-							console.log("success register user : ", util.inspect(user, utilOptions));
+							console.log("success register user : ", util.inspect(user.dataValues, utilOptions));
 							new SuccessResponse('register', {token: utils.getToken(inputEmail, user.dataValues.id)}).sendResponse(res);
 						}).catch((err) => {
 							console.log('error send mail : ', util.inspect(err, utilOptions));
