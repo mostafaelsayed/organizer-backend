@@ -36,7 +36,9 @@ router.get('/get/:id', function(req, res) {
 });
 
 router.post('/add', function(req, res) {
-    Reservation.create({name: req.body.reservation.name, userId: getUserInfo(req, res).id}).then((success) => {
+    console.log('req.body add reservation : ', util.inspect(req.body, utilOptions));
+    let dateArr = req.body.reservation.reservationDate.split(', ');
+    Reservation.create({name: req.body.reservation.name, userId: getUserInfo(req, res).id, reservationDate: dateArr[0], reservationTime: dateArr[1]}).then((success) => {
         console.log('success add reservation : ', util.inspect(success.dataValues, utilOptions));
         new SuccessResponse('adding one reservation').sendResponse(res);
     }).catch((err) => {
