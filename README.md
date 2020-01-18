@@ -2,5 +2,6 @@
 
 ## Changelog
 
+* edit reservation
 * add support for oauth authentication using facebook in remote server
 * add support for oauth authentication using google
