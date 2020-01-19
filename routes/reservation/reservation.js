@@ -36,28 +36,10 @@ router.get('/get/:id', function(req, res) {
     });
 });
 
-function convertDateTime(time) {
-    if (time.indexOf('AM') !== -1) {
-        return time.substring(0, time.indexOf(' '));
-    }
-    else {
-        let hours = parseInt(time.substring(0, time.indexOf(' '))) + 12;
-
-        return hours + time.substring(time.indexOf(':'), time.indexOf(' ') + 1);
-    }
-}
-
-function reverse(s){
-    return s.split("").reverse().join("");
-}
-
 router.post('/add', function(req, res) {
     console.log('req.body add reservation : ', util.inspect(req.body, utilOptions));
     let dateArr = req.body.reservation.reservationDate.split(', ');
-    dateArr[1] = convertDateTime(dateArr[1]);
-    //dateArr[1] = dateArr[1].split(' ');
-    //dateArr[1][0] += ':00';
-    //dateArr[1] = dateArr[1].join(' ');
+   
     console.log('date arr : ', util.inspect(dateArr, utilOptions));
     Reservation.create({name: req.body.reservation.name, userId: getUserInfo(req, res).id, reservationDate: dateArr[0], reservationTime: dateArr[1]}).then((success) => {
         console.log('success add reservation : ', util.inspect(success.dataValues, utilOptions));
@@ -71,22 +53,19 @@ router.post('/add', function(req, res) {
 router.post('/edit/:id', function(req, res) {
     console.log('req.body edit reservation : ', util.inspect(req.body, utilOptions));
     let dateArr = req.body.reservation.reservationDate.split(', ');
-    dateArr[1] = convertDateTime(dateArr[1]);
-    //dateArr[1] = dateArr[1].split(' ');
-    //dateArr[1][0] += ':00';
-    //dateArr[1] = dateArr[1].join(' ');
-    console.log('date arr : ', util.inspect(dateArr, utilOptions));
+   
+    console.log('date arr edit reservation : ', util.inspect(dateArr, utilOptions));
     Reservation.update({name: req.body.reservation.name, reservationDate: dateArr[0], reservationTime: dateArr[1]}, {
         where: {
             userId: getUserInfo(req, res).id,
             id: req.params.id
         }
     }).then((success) => {
-        console.log('success add reservation : ', util.inspect(success.dataValues, utilOptions));
-        new SuccessResponse('adding one reservation').sendResponse(res);
+        console.log('success edit reservation : ', util.inspect(success.dataValues, utilOptions));
+        new SuccessResponse('editing one reservation').sendResponse(res);
     }).catch((err) => {
-        console.error('error creating reservation : ', util.inspect(err, utilOptions));
-        new errorResponses.InternalErrorResponse('adding one reservation').sendResponse(res);
+        console.error('error editing reservation : ', util.inspect(err, utilOptions));
+        new errorResponses.InternalErrorResponse('editing one reservation').sendResponse(res);
     });
 });
 
