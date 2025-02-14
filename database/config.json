@@ -5,6 +5,6 @@
         "password": "mostafa",
         "port": 3306,
         "database": "the-organizer",
-        "url": "mysql://root:mostafa@localhost:3306/the-organizer"
+        "url": "mysql://root:123456@localhost:3306/the-organizer"
     }
 }

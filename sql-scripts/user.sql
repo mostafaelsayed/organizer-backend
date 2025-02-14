@@ -1,0 +1,7 @@
+CREATE TABLE `the-organizer`.`users` (
+    `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `email` varchar(100), `firstName` varchar(100),
+    `phoneNumber` varchar(20),
+    `passwordHash` varchar(1000),
+    `lastName` varchar(50)
+);

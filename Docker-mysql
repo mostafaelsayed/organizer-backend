@@ -1,0 +1,4 @@
+FROM mysql:9.2.0
+COPY container-startup-scripts/aliases.sh /aliases.sh
+RUN chmod +x /aliases.sh
+ENTRYPOINT ["/bin/bash", "-c", "source aliases.sh && docker-entrypoint.sh mysqld"]
