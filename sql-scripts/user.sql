@@ -1,4 +1,4 @@
-CREATE TABLE `the-organizer`.`users` (
+CREATE TABLE IF NOT EXISTS `the-organizer`.`users` (
     `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `email` varchar(100), `firstName` varchar(100),
     `phoneNumber` varchar(20),

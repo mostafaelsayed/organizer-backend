@@ -1,1 +1,1 @@
-CREATE SCHEMA `the-organizer`;
+CREATE SCHEMA IF NOT EXISTS `the-organizer`;
