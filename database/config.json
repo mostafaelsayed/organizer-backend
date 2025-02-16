@@ -2,9 +2,9 @@
     "dev": {
         "host": "localhost",
         "username": "root",
-        "password": "mostafa",
+        "password": "root",
         "port": 3306,
         "database": "the-organizer",
-        "url": "mysql://root:123456@localhost:3306/the-organizer"
+        "url": "mysql://root:root@localhost:3306/the-organizer"
     }
 }
