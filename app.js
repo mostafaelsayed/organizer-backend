@@ -36,6 +36,10 @@ app.use('/api/reservation', verifyToken);
 
 app.use('/api/reservation', reservationRouter);
 
+app.get('/healthy', function(req, res) {
+	res.status(200).send('Organizer is running');
+});
+
 app.listen(port, function() {
     console.log(`Listening on port ${port}`);
 });
