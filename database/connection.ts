@@ -1,13 +1,14 @@
-const Sequelize = require('sequelize');
+// filepath: c:\Users\mosta\Documents\PersonalApps\organizer-backend\database\connection.ts
+import { Sequelize } from 'sequelize';
 
-var config = {};
+let config: string = '';
 
 // remote
 if (process.env.JAWSDB_URL) {
     config = process.env.JAWSDB_URL;
-}
-else {
-    config = require('./config.json')['dev']['url'];
+} else {
+    const configFile = require('./config.json');
+    config = configFile['dev']['url'];
 }
 
 // Option 1: Passing parameters separately
@@ -17,10 +18,9 @@ else {
 //     dialect: 'mysql'
 // });
 
-
 // Option 2: Passing a connection URI
-//export default new Sequelize(config);
+// export default new Sequelize(config);
 
 const sequelize = new Sequelize(config);
 
-module.exports = sequelize;
+export default sequelize;
