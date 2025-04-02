@@ -1,7 +1,7 @@
 source remove-mysql.sh
 
 docker run --name mysql-organizer \
-    -v ./mysql-data:/var/lib/mysql \
+    -v mysqldata:/var/lib/mysql \
     --mount type=bind,src="$(pwd)"/sql-creds,dst=/run/secrets/ \
     --mount type=bind,src="$(pwd)"/mysql-startup-scripts,dst=/docker-entrypoint-initdb.d \
     -p 3306:3306 \
