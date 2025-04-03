@@ -8,10 +8,10 @@ import {
   InternalErrorResponse,
 } from '../../models/response/error';
 import SuccessResponse from '../../models/response/success';
-
+import { Request, Response } from 'express';
 const router = Router(); 
 
-router.post('/login', async (req, res) => {
+async function login (req: Request, res: Response) {
   const { email, password } = req.body;
   console.log('7mada');
   try {
@@ -34,7 +34,33 @@ router.post('/login', async (req, res) => {
     console.error('Error during login:', util.inspect(error, utilOptions));
     new InternalErrorResponse('login').sendResponse(res);
   }
-});
+}
+
+async function loginGraphql (req: any) {
+  console.log('7mada req: ', req);
+  try {
+    const userRecord = await User.findOne({ where: { email: req.email } });
+    if (!userRecord) {
+      return null;
+    }
+
+    const user = userRecord.toJSON();
+    const hash = userRecord.passwordHash;
+
+    const isMatch = await bcrypt.compare(req.password, hash);
+    if (isMatch) {
+      const jwt = getToken(req.email, user.id);
+      return userRecord;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error('Error during login:', util.inspect(error, utilOptions));
+    return null;
+  }
+}
+
+router.post('/login', login);
 
 router.post('/register', async (req, res) => {
   const { email, firstName, lastName, password, phoneNumber } = req.body;
@@ -59,3 +85,4 @@ router.post('/register', async (req, res) => {
 });
 
 export default router;
+export { loginGraphql }

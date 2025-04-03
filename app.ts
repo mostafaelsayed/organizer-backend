@@ -9,6 +9,37 @@ import { port } from './config';
 
 const app = express();
 
+import { ApolloServer } from '@apollo/server';
+import { startStandaloneServer } from '@apollo/server/standalone';
+import { readFileSync } from 'fs';
+import path from 'path';
+import { loginGraphql } from './routes/user/user';
+
+// 1
+const typeDefs = readFileSync(path.join(__dirname, './graphql/schema.graphql'), 'utf-8');
+
+// 2
+const resolvers = {
+  Query: {
+    user: async (_parent: any, _args: any, context: any) => {return await loginGraphql(context.req)}
+  }
+}
+
+// 3
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+})
+
+
+
+async function startGraphqlServer() {
+  const { url } = await startStandaloneServer(server, {listen: {port: 5000}, context: async({req}) => {return {req: req}}});
+  const formattedDate = new Date().toISOString().slice(0, 23) + 'Z'; // Formats as "YYYY-MM-DDTHH:MM:SS.sssZ"
+  console.log(`Server ready at ${url}. Current time: ${formattedDate}`);
+}
+
+
 app.use(
   session({
     saveUninitialized: false,
@@ -31,3 +62,5 @@ app.get('/healthy', (req, res) => {
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
+
+startGraphqlServer();
