@@ -1,4 +1,3 @@
-import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import User from '../../models/user/user';
 import { getToken } from '../../utils';
@@ -10,7 +9,6 @@ import {
 } from '../../models/response/error';
 import SuccessResponse from '../../models/response/success';
 import { ValidationError } from 'sequelize';
-const router = Router(); 
 
 async function loginGraphql (args: User) {
   console.log('args: ', args);
@@ -64,5 +62,4 @@ async function registerUserGraphql(args: User) {
   }
 }
 
-export default router;
 export { loginGraphql, registerUserGraphql }

@@ -2,18 +2,16 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import session from 'express-session';
-import userRouter from './routes/user/user';
 import reservationRouter from './routes/reservation/reservation';
 import { verifyToken } from './utils';
 import { port } from './config';
-
-const app = express();
-
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import { readFileSync } from 'fs';
 import path from 'path';
 import { resolvers } from './graphql/resolvers';
+
+const app = express();
 
 const typeDefs = readFileSync(path.join(__dirname, './graphql/schema.graphql'), 'utf-8');
 
@@ -40,7 +38,6 @@ app.use(cors({ credentials: true, origin: true }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use('/api/user', userRouter);
 app.use('/api/reservation', verifyToken, reservationRouter);
 
 app.get('/health', (req, res) => {
