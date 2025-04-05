@@ -1,5 +1,9 @@
 type Query {
-    user: User
+    user(email: String!, password: String!): User
+}
+
+type Mutation {
+    registerUser(email: String!, firstName: String!, lastName: String, phoneNumber: String, password: String!): User
 }
 
 type User {

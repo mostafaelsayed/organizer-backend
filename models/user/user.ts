@@ -17,6 +17,7 @@ class User extends Model<UserAttributes> implements UserAttributes {
   public lastName?: string;
   public phoneNumber?: string;
   public passwordHash!: string;
+  public password!: string;
 
   // Timestamps
   public readonly createdAt!: Date;
@@ -28,6 +29,7 @@ User.init(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true
     },
     firstName: {
       type: DataTypes.STRING,

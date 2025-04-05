@@ -36,10 +36,10 @@ async function login (req: Request, res: Response) {
   }
 }
 
-async function loginGraphql (req: any) {
-  console.log('7mada req: ', req);
+async function loginGraphql (args: User) {
+  console.log('args: ', args);
   try {
-    const userRecord = await User.findOne({ where: { email: req.email } });
+    const userRecord = await User.findOne({ where: { email: args.email } });
     if (!userRecord) {
       return null;
     }
@@ -47,9 +47,9 @@ async function loginGraphql (req: any) {
     const user = userRecord.toJSON();
     const hash = userRecord.passwordHash;
 
-    const isMatch = await bcrypt.compare(req.password, hash);
+    const isMatch = await bcrypt.compare(args.password, hash);
     if (isMatch) {
-      const jwt = getToken(req.email, user.id);
+      const jwt = getToken(args.email, user.id);
       return userRecord;
     } else {
       return null;
@@ -62,9 +62,9 @@ async function loginGraphql (req: any) {
 
 router.post('/login', login);
 
-router.post('/register', async (req, res) => {
+async function register(req: Request, res: Response) {
   const { email, firstName, lastName, password, phoneNumber } = req.body;
-
+  
   try {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
@@ -82,7 +82,32 @@ router.post('/register', async (req, res) => {
     console.error('Error during registration:', util.inspect(error, utilOptions));
     new InternalErrorResponse('register').sendResponse(res);
   }
-});
+}
+
+async function registerUserGraphql(args: User) {
+  const { email, firstName, lastName, password, phoneNumber } = args;
+  
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+
+    const user = await User.create({
+      email,
+      firstName,
+      lastName,
+      phoneNumber,
+      passwordHash: hash,
+    });
+
+    return user;
+  }
+  catch (error) {
+    console.error('Error during registration:', util.inspect(error, utilOptions));
+    return null;
+  }
+}
+
+router.post('/register', register);
 
 export default router;
-export { loginGraphql }
+export { loginGraphql, registerUserGraphql }

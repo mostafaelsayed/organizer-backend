@@ -13,7 +13,8 @@ import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import { readFileSync } from 'fs';
 import path from 'path';
-import { loginGraphql } from './routes/user/user';
+import { loginGraphql, registerUserGraphql } from './routes/user/user';
+import User from './models/user/user';
 
 // 1
 const typeDefs = readFileSync(path.join(__dirname, './graphql/schema.graphql'), 'utf-8');
@@ -21,7 +22,12 @@ const typeDefs = readFileSync(path.join(__dirname, './graphql/schema.graphql'), 
 // 2
 const resolvers = {
   Query: {
-    user: async (_parent: any, _args: any, context: any) => {return await loginGraphql(context.req)}
+    user: async (parent: any, args: User) => {return await loginGraphql(args)}
+  },
+  Mutation: {
+    registerUser: async (parent: any, args: User) => {
+      return await registerUserGraphql(args);
+    }
   }
 }
 
@@ -55,7 +61,7 @@ app.use(bodyParser.json());
 app.use('/api/user', userRouter);
 app.use('/api/reservation', verifyToken, reservationRouter);
 
-app.get('/healthy', (req, res) => {
+app.get('/health', (req, res) => {
   res.status(200).send('Organizer is running');
 });
 
