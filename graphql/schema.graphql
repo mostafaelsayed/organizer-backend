@@ -1,9 +1,16 @@
 type Query {
-    user(email: String!, password: String!): User
+    loginUser(email: String!, password: String!): UserResponse
 }
 
 type Mutation {
-    registerUser(email: String!, firstName: String!, lastName: String, phoneNumber: String, password: String!): User
+    registerUser(email: String!, firstName: String!, lastName: String, phoneNumber: String, password: String!): UserResponse
+}
+
+type UserResponse {
+    _statusCode: Int!,
+    _responseMessage: String,
+    _data: User,
+    _action: String
 }
 
 type User {
@@ -13,5 +20,6 @@ type User {
     lastName: String,
     phoneNumber: String,
     passwordHash: String!,
-    password: String!
+    password: String!,
+    jwt: String
 }

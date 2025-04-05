@@ -29,9 +29,16 @@ class InternalErrorResponse extends ErrorResponse {
   }
 }
 
+class BadRequestErrorResponse extends ErrorResponse {
+  constructor(action?: string, responseMessage?: string) {
+    super(400, responseMessage || 'Bad Request', action);
+  }
+}
+
 export {
   ErrorResponse,
   NotAuthenticatedResponse,
   NotFoundResponse,
   InternalErrorResponse,
+  BadRequestErrorResponse
 };

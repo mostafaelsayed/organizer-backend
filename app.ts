@@ -22,7 +22,7 @@ const typeDefs = readFileSync(path.join(__dirname, './graphql/schema.graphql'), 
 // 2
 const resolvers = {
   Query: {
-    user: async (parent: any, args: User) => {return await loginGraphql(args)}
+    loginUser: async (parent: any, args: User) => {return await loginGraphql(args)}
   },
   Mutation: {
     registerUser: async (parent: any, args: User) => {
