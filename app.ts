@@ -13,38 +13,20 @@ import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import { readFileSync } from 'fs';
 import path from 'path';
-import { loginGraphql, registerUserGraphql } from './routes/user/user';
-import User from './models/user/user';
+import { resolvers } from './graphql/resolvers';
 
-// 1
 const typeDefs = readFileSync(path.join(__dirname, './graphql/schema.graphql'), 'utf-8');
 
-// 2
-const resolvers = {
-  Query: {
-    loginUser: async (parent: any, args: User) => {return await loginGraphql(args)}
-  },
-  Mutation: {
-    registerUser: async (parent: any, args: User) => {
-      return await registerUserGraphql(args);
-    }
-  }
-}
-
-// 3
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-})
-
-
+});
 
 async function startGraphqlServer() {
   const { url } = await startStandaloneServer(server, {listen: {port: 5000}, context: async({req}) => {return {req: req}}});
   const formattedDate = new Date().toISOString().slice(0, 23) + 'Z'; // Formats as "YYYY-MM-DDTHH:MM:SS.sssZ"
   console.log(`Server ready at ${url}. Current time: ${formattedDate}`);
 }
-
 
 app.use(
   session({
