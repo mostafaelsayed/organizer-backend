@@ -9,6 +9,18 @@ import {
 } from '../../models/response/error';
 import SuccessResponse from '../../models/response/success';
 import { ValidationError } from 'sequelize';
+import Response from '../../models/response/response';
+
+async function getAllUsers(): Promise<Response> {
+  try {
+    const users = await User.findAll();
+    return new SuccessResponse('get users', users);
+  }
+  catch(e) {
+    console.error('error getting all users: ', e);
+    return new InternalErrorResponse('get users');
+  }
+}
 
 async function loginGraphql (args: User) {
   console.log('args: ', args);
@@ -62,4 +74,4 @@ async function registerUserGraphql(args: User) {
   }
 }
 
-export { loginGraphql, registerUserGraphql }
+export { loginGraphql, registerUserGraphql, getAllUsers }

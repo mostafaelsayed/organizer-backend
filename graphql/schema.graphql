@@ -1,5 +1,6 @@
 type Query {
-    loginUser(email: String!, password: String!): UserResponse
+    loginUser(email: String!, password: String!): UserResponse,
+    getAllUsers: AllUsersResponse
 }
 
 type Mutation {
@@ -10,6 +11,13 @@ type UserResponse {
     _statusCode: Int!,
     _responseMessage: String,
     _data: User,
+    _action: String
+}
+
+type AllUsersResponse {
+    _statusCode: Int!,
+    _responseMessage: String,
+    _data: [User],
     _action: String
 }
 
