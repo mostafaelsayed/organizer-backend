@@ -8,3 +8,5 @@ CREATE TABLE IF NOT EXISTS `the-organizer`.`users` (
 
 ALTER TABLE `the-organizer`.`users`
 ADD CONSTRAINT UNIQUE (`email`);
+
+ALTER TABLE `the-organizer`.`users` ADD COLUMN `createdAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, ADD COLUMN `updatedAT` TIMESTAMP DEFAULT CURRENT_TIMESTAMP;

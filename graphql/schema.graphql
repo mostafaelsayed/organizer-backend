@@ -1,3 +1,5 @@
+scalar DateTime @specifiedBy(url: "https://scalars.graphql.org/andimarek/date-time")
+
 type Query {
     loginUser(email: String!, password: String!): UserResponse,
     getAllUsers: AllUsersResponse
@@ -21,6 +23,15 @@ type AllUsersResponse {
     _action: String
 }
 
+type Reservation {
+    id: ID!,
+    name: String!,
+    description: String,
+    userId: Int!,
+    createdAt: DateTime,
+    updatedAt: DateTime
+}
+
 type User {
     id: ID!,
     email: String!,
@@ -28,6 +39,9 @@ type User {
     lastName: String,
     phoneNumber: String,
     passwordHash: String!,
-    password: String!,
-    jwt: String
+    password: String,
+    reservations: [Reservation],
+    jwt: String,
+    createdAt: DateTime,
+    updatedAt: DateTime
 }

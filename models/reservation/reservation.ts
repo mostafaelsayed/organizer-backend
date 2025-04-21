@@ -1,43 +1,39 @@
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes, Model, BelongsToGetAssociationMixin, InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey } from 'sequelize';
 import User from '../user/user';
 import sequelize from '../../database/connection';
 
-interface ReservationAttributes {
-  id?: number;
-  name: string;
-  userId: number;
-}
-
-class Reservation extends Model<ReservationAttributes> implements ReservationAttributes {
-  public id!: number;
-  public name!: string;
-  public userId!: number;
-
+class Reservation extends Model<InferAttributes<Reservation>, InferCreationAttributes<Reservation>> {
+  declare id: CreationOptional<number>;
+  declare name: string;
+  declare description?: CreationOptional<string>;
+  declare getUser: BelongsToGetAssociationMixin<User>;
+  declare userId: ForeignKey<User['id']>;
   // Timestamps
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  declare createdAt?: CreationOptional<Date>;
+  declare updatedAt?: CreationOptional<Date>;
 }
 
 Reservation.init(
   {
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true
+    },
     name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100),
       allowNull: false,
     },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: User,
-        key: 'id',
-      },
-    },
+    description: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+    }
   },
   {
     sequelize: sequelize, // Pass the connection instance
     modelName: 'Reservation',
     tableName: 'reservations',
-    timestamps: false, // Disable timestamps if not needed
+    timestamps: true, // Disable timestamps if not needed
   }
 );
 

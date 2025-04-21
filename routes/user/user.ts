@@ -1,5 +1,4 @@
 import bcrypt from 'bcryptjs';
-import User from '../../models/user/user';
 import { getToken } from '../../utils';
 import { util, utilOptions } from '../../config';
 import {
@@ -10,6 +9,7 @@ import {
 import SuccessResponse from '../../models/response/success';
 import { ValidationError } from 'sequelize';
 import Response from '../../models/response/response';
+import { Reservation, User } from '../../models/models';
 
 async function getAllUsers(): Promise<Response> {
   try {
@@ -25,18 +25,18 @@ async function getAllUsers(): Promise<Response> {
 async function loginGraphql (args: User) {
   console.log('args: ', args);
   try {
-    const userRecord = await User.findOne({ where: { email: args.email } });
+    const userRecord: User | null = await User.findOne({ where: { email: args.email } });
     if (!userRecord) {
       return null;
     }
 
-    const user = userRecord.toJSON();
-    const hash = userRecord.passwordHash;
+    const hash: string = userRecord.passwordHash;
+    const reservations: Reservation[] = await userRecord.getReservations();
 
-    const isMatch = await bcrypt.compare(args.password, hash);
+    const isMatch: boolean = await bcrypt.compare(args.password, hash);
     if (isMatch) {
-      const jwt = getToken(args.email, user.id);
-      return new SuccessResponse('login', { jwt, ...user });
+      const jwt: string = getToken(args.email, userRecord.id);
+      return new SuccessResponse('login', { jwt, ...userRecord.toJSON(), reservations });
     } else {
       return new NotAuthenticatedResponse('login');
     }
@@ -50,10 +50,10 @@ async function registerUserGraphql(args: User) {
   const { email, firstName, lastName, password, phoneNumber } = args;
   
   try {
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(password, salt);
+    const salt: string = await bcrypt.genSalt(10);
+    const hash: string = await bcrypt.hash(password, salt);
 
-    const user = await User.create({
+    const user: User = await User.create({
       email,
       firstName,
       lastName,
