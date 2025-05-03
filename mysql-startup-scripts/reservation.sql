@@ -7,3 +7,5 @@ CREATE TABLE IF NOT EXISTS `the-organizer`.`reservations` (
     `updatedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(userId) REFERENCES users(id)
 );
+
+ALTER TABLE `the-organizer`.`reservations` ADD COLUMN `reservationTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP;

@@ -29,7 +29,8 @@ type Reservation {
     description: String,
     userId: Int!,
     createdAt: DateTime,
-    updatedAt: DateTime
+    updatedAt: DateTime,
+    reservationTime: DateTime
 }
 
 type User {
