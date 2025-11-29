@@ -10,6 +10,7 @@ import SuccessResponse from '../../models/response/success';
 import { ValidationError } from 'sequelize';
 import Response from '../../models/response/response';
 import { Reservation, User } from '../../models/models';
+import { deleteReservationGraphql } from '../../routes/reservation/reservation';
 
 async function getAllUsers(): Promise<Response> {
   try {
@@ -20,6 +21,21 @@ async function getAllUsers(): Promise<Response> {
     console.error('error getting all users: ', e);
     return new InternalErrorResponse('get users');
   }
+}
+
+async function getUserByEmail(email: string): Promise<User | null> {
+  try {
+    const user = await User.findOne({
+      where: {
+        email
+      }
+    })
+    return user;
+  }
+  catch(e) {
+    console.error('error getting all users: ', e);
+  }
+  return null;
 }
 
 async function loginGraphql (args: User) {
@@ -74,4 +90,27 @@ async function registerUserGraphql(args: User) {
   }
 }
 
-export { loginGraphql, registerUserGraphql, getAllUsers }
+async function deleteUserGraphql(args: User) {
+  const { email } = args;
+  
+  try {
+    await deleteReservationGraphql(args);
+    const user = await getUserByEmail(email);
+    await user?.destroy();
+
+    console.log('user deleted!');
+
+    return new SuccessResponse('delete', { email });
+  }
+  catch (error: unknown) {
+    console.error('Error during delete:', util.inspect(error, utilOptions));
+    if (error instanceof ValidationError) {
+      return new BadRequestErrorResponse('delete', error.errors[0].message);
+    }
+    else {
+      return new InternalErrorResponse('delete');
+    }
+  }
+}
+
+export { loginGraphql, registerUserGraphql, getAllUsers, deleteUserGraphql, getUserByEmail }

@@ -2,11 +2,9 @@ scalar DateTime @specifiedBy(url: "https://scalars.graphql.org/andimarek/date-ti
 
 type Query {
     loginUser(email: String!, password: String!): UserResponse,
-    getAllUsers: AllUsersResponse
-}
-
-type Mutation {
-    registerUser(email: String!, firstName: String!, lastName: String, phoneNumber: String, password: String!): UserResponse
+    deleteUser(email: String!): UserResponse,
+    registerUser(email: String!, firstName: String!, lastName: String, phoneNumber: String, password: String!): UserResponse,
+    getAllUsers: AllUsersResponse,
 }
 
 type UserResponse {

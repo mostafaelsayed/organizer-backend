@@ -2,8 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import session from 'express-session';
-import reservationRouter from './routes/reservation/reservation';
-import { verifyToken } from './utils';
 import { port } from './config';
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
@@ -38,7 +36,7 @@ app.use(cors({ credentials: true, origin: true }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use('/api/reservation', verifyToken, reservationRouter);
+// app.use('/api/reservation', verifyToken, reservationRouter);
 
 app.get('/health', (req, res) => {
   res.status(200).send('Organizer is running');

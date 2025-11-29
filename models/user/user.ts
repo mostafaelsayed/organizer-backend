@@ -58,4 +58,6 @@ User.init(
   }
 );
 
+User.hasMany(Reservation, {onDelete: 'CASCADE', hooks: true})
+
 export default User;

@@ -1,0 +1,2 @@
+1,'mostbadawy94@gmail.com','mostafa','0101235','$2a$10$iPVFsUdJyZU3s4ffDlSr1e2oNIlEc/GrwNZNyJ8G4UgUW3v.Zdq7y',NULL,'2025-04-21 17:02:33','2025-04-21T17:02:33'
+13,'mostafaelsayed9419@gmail.com','mostafa','01012345455','$2a$10$7zDrJgzlQ4RW0/2z4/k1Ge.PzpjTCLiNQIIiVovHppOy4GqqDpzpm',NULL,'2025-04-21 17:02:33','2025-04-21 17:02:33'
