@@ -5,6 +5,7 @@ type Query {
     deleteUser(email: String!): UserResponse,
     registerUser(email: String!, firstName: String!, lastName: String, phoneNumber: String, password: String!): UserResponse,
     getAllUsers: AllUsersResponse,
+    deleteReservation(email: String!): BaseResponse
 }
 
 type UserResponse {
@@ -12,6 +13,19 @@ type UserResponse {
     _responseMessage: String,
     _data: User,
     _action: String
+}
+
+type ReservationDeletionResponse {
+    _statusCode: Int!,
+    _responseMessage: String,
+    _data: [User],
+    _action: String
+}
+
+type BaseResponse {
+    _statusCode: Int!,
+    _responseMessage: String,
+    _data: String
 }
 
 type AllUsersResponse {
