@@ -5,6 +5,6 @@
         "password": "test",
         "port": 3306,
         "database": "organizer",
-        "url": "mysql://org:test@172.17.0.3:3306/organizer"
+        "url": "mysql://root:123456@localhost:3306/organizer"
     }
 }
