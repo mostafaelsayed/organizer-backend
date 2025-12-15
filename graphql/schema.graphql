@@ -5,12 +5,20 @@ type Query {
     deleteUser(email: String!): UserResponse,
     registerUser(email: String!, firstName: String!, lastName: String, phoneNumber: String, password: String!): UserResponse,
     getAllUsers: AllUsersResponse,
+    createReservation(name: String!, description: String!): ReservationResponse
 }
 
 type UserResponse {
     _statusCode: Int!,
     _responseMessage: String,
     _data: User,
+    _action: String
+}
+
+type ReservationResponse {
+    _statusCode: Int!,
+    _responseMessage: String,
+    _data: Reservation,
     _action: String
 }
 

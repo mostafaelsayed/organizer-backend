@@ -1,1 +1,1 @@
-docker stop mysql-organizer && docker rm mysql-organizer
+docker stop organizer-db && docker rm organizer-db

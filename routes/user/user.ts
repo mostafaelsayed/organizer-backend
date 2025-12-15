@@ -11,6 +11,7 @@ import { ValidationError } from 'sequelize';
 import Response from '../../models/response/response';
 import { Reservation, User } from '../../models/models';
 import { deleteReservationGraphql } from '../../routes/reservation/reservation';
+import { MyContext } from '../../models/my-context';
 
 async function getAllUsers(): Promise<Response> {
   try {
@@ -38,7 +39,7 @@ async function getUserByEmail(email: string): Promise<User | null> {
   return null;
 }
 
-async function loginGraphql (args: User) {
+async function loginGraphql (args: User, context: MyContext) {
   console.log('args: ', args);
   try {
     const userRecord: User | null = await User.findOne({ where: { email: args.email } });
@@ -52,7 +53,9 @@ async function loginGraphql (args: User) {
     const isMatch: boolean = await bcrypt.compare(args.password, hash);
     if (isMatch) {
       const jwt: string = getToken(args.email, userRecord.id);
-      return new SuccessResponse('login', { jwt, ...userRecord.toJSON(), reservations });
+      context.req.session.user = userRecord;
+      context.req.session.save();
+      return new SuccessResponse('login', { jwt, ...userRecord.toJSON() });
     } else {
       return new NotAuthenticatedResponse('login');
     }

@@ -1,1 +1,1 @@
-docker build -t mysql-organizer -f Docker-mysql .
+docker build -t organizer/db -f Docker-mysql .

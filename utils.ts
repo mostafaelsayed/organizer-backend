@@ -3,7 +3,7 @@ import { secret } from './config';
 import { NotAuthenticatedResponse } from './models/response/error';
 import { Request, Response, NextFunction } from 'express';
 export function getToken(email: string, id: number | undefined): string {
-  return jwt.sign({ email, id }, secret, { expiresIn: 24 * 60 * 60 });
+  return jwt.sign({ email, id }, secret, { expiresIn: 1 * 60 * 60 });
 }
 
 export function verifyToken(req: Request, res: Response, next: NextFunction): void {

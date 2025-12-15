@@ -1,10 +1,10 @@
 {
     "dev": {
         "host": "localhost",
-        "username": "root",
-        "password": "root",
+        "username": "org",
+        "password": "test",
         "port": 3306,
-        "database": "the-organizer",
-        "url": "mysql://root:testoha@localhost:3306/the-organizer"
+        "database": "organizer",
+        "url": "mysql://org:test@172.17.0.3:3306/organizer"
     }
 }

@@ -1,5 +1,7 @@
+import { Reservation } from "../models/models";
+import { MyContext } from "../models/my-context";
 import User from "../models/user/user";
-import { deleteReservationGraphql } from "../routes/reservation/reservation";
+import { createReservationGraphql } from "../routes/reservation/reservation";
 import { loginGraphql, registerUserGraphql, getAllUsers, deleteUserGraphql } from '../routes/user/user';
 
 const resolvers = {
@@ -10,11 +12,12 @@ const resolvers = {
         deleteUser: async (parent: any, args: User) => {
             return await deleteUserGraphql(args);
         },
-        deleteReservation: async (parent: any, args: User) => {
-            return await deleteReservationGraphql(args);
-        },
-        loginUser: async (parent: any, args: User) => {return await loginGraphql(args)},
-        getAllUsers: async (parent: any) => { return await getAllUsers() }
+        // deleteReservation: async (parent: any, args: User) => {
+        //     return await deleteReservationGraphql(args);
+        // },
+        loginUser: async (parent: any, args: User, context: MyContext) => {return await loginGraphql(args, context)},
+        getAllUsers: async (parent: any) => { return await getAllUsers() },
+        createReservation: async (parent: any, args: Reservation, context: MyContext) => {return await createReservationGraphql(args, context)},
     }
 }
 

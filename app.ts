@@ -4,46 +4,94 @@ import bodyParser from 'body-parser';
 import session from 'express-session';
 import { port } from './config';
 import { ApolloServer } from '@apollo/server';
-import { startStandaloneServer } from '@apollo/server/standalone';
 import { readFileSync } from 'fs';
 import path from 'path';
 import { resolvers } from './graphql/resolvers';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import http from 'http';
+import { expressMiddleware } from '@as-integrations/express5';
+import { MyContext } from './models/my-context';
 
 const app = express();
-
+const httpServer = http.createServer();
 const typeDefs = readFileSync(path.join(__dirname, './graphql/schema.graphql'), 'utf-8');
 
-const server = new ApolloServer({
+const server = new ApolloServer<MyContext>({
   typeDefs,
   resolvers,
+  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 });
 
 async function startGraphqlServer() {
-  const { url } = await startStandaloneServer(server, {listen: {port: 5000}, context: async({req}) => {return {req: req}}});
+  await server.start();
   const formattedDate = new Date().toISOString().slice(0, 23) + 'Z'; // Formats as "YYYY-MM-DDTHH:MM:SS.sssZ"
-  console.log(`Server ready at ${url}. Current time: ${formattedDate}`);
+  console.log(`Server ready. Current time: ${formattedDate}`);
+  startExpressApp();
 }
 
-app.use(
-  session({
-    saveUninitialized: false,
-    resave: false,
-    secret: 'organizer-app',
+function ensureLoggedIn(req: any) {
+  if (!req.session.user) {
+    console.error('not signed in');
+    return false;
+  }
+  else {
+    console.log('signed in');
+    return true;
+  }
+}
+
+function startExpressApp() {
+  app.use(
+    session({
+      saveUninitialized: false,
+      resave: false,
+      secret: 'organizer-app',
+      cookie: {
+        secure: false,
+        sameSite: 'lax',
+        httpOnly: true,
+        maxAge: 60 * 1000 * 3 * 1
+      }
+    })
+  );
+
+  app.use(cors({
+    credentials: true,
+    origin: true
+  }));
+  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.json());
+
+  app.use((req, res, next) => {
+    console.log('req url: ', req.body.query);
+    if (!req.body.query.includes('login') && !req.body.query.includes('register')) {
+      if (ensureLoggedIn(req)) {
+        next();
+      }
+      else {
+        res.status(401).send();
+      }
+    }
+    else {
+      next();
+    }
   })
-);
 
-app.use(cors({ credentials: true, origin: true }));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+  app.use(
+    expressMiddleware(server, {
+      context: async ({ req }) => ({ req: req }),
+    }),
+  )
 
-// app.use('/api/reservation', verifyToken, reservationRouter);
+  
 
-app.get('/health', (req, res) => {
-  res.status(200).send('Organizer is running');
-});
+  app.get('/health', (req, res) => {
+    res.status(200).send('Organizer is running');
+  });
 
-app.listen(port, () => {
-  console.log(`Listening on port ${port}`);
-});
+  app.listen(port, () => {
+    console.log(`Listening on port ${port}`);
+  });
+}
 
 startGraphqlServer();

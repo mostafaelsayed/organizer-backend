@@ -1,5 +1,11 @@
 FROM node:23-alpine3.20
-WORKDIR /usr/app
-COPY ./ ./
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+# Install app dependencies
+COPY package.json /usr/src/app/
 RUN npm install
-CMD ["node", "app.js"]
+
+# Bundle app source
+COPY . /usr/src/app
+CMD ["npm", "start"]

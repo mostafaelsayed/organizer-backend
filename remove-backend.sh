@@ -1,0 +1,1 @@
+docker stop organizer-backend && docker rm organizer-backend
