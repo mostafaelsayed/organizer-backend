@@ -1,5 +1,4 @@
 import express from 'express';
-import cors from 'cors';
 import bodyParser from 'body-parser';
 import session from 'express-session';
 import { port } from './config';
@@ -50,20 +49,25 @@ function startExpressApp() {
         secure: false,
         sameSite: 'lax',
         httpOnly: true,
-        maxAge: 60 * 1000 * 3 * 1
+        maxAge: 60 * 1000 * 60 * 1
       }
     })
   );
 
-  app.use(cors({
-    credentials: true,
-    origin: true
-  }));
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
 
   app.use((req, res, next) => {
-    console.log('req url: ', req.body.query);
+    if (req.headers.origin == process.env.FRONTEND_ORIGIN) {
+      res.setHeader("Access-Control-Allow-Origin", String(req.headers.origin));
+    }
+    res.setHeader("Access-Control-Allow-Methods", "POST");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    if (req.method == 'OPTIONS') {
+      res.sendStatus(204);
+      return;
+    }
     if (!req.body.query.includes('login') && !req.body.query.includes('register')) {
       if (ensureLoggedIn(req)) {
         next();
@@ -91,6 +95,7 @@ function startExpressApp() {
 
   app.listen(port, () => {
     console.log(`Listening on port ${port}`);
+    console.log('devvvvvvv');
   });
 }
 

@@ -48,7 +48,7 @@ async function createReservationGraphql(args: Reservation, context: MyContext): 
       description
     });
 
-    return new SuccessResponse('create-reservation', { id: reservation.id});
+    return new SuccessResponse('create-reservation', reservation);
   }
   catch (error: unknown) {
     console.error('Error during registration:', util.inspect(error, utilOptions));

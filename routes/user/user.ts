@@ -39,6 +39,27 @@ async function getUserByEmail(email: string): Promise<User | null> {
   return null;
 }
 
+async function getUserReservations(context: MyContext) {
+  try {
+    if (!context.req.session.user) {
+      return new NotAuthenticatedResponse('login');
+    }
+    const reservations = await Reservation.findAll({
+      where: {
+        userId: context.req.session.user.id
+      }
+    });
+
+    const user = reservations[0].getUser();
+
+    return new SuccessResponse('userReservations', {user,reservations});
+  }
+  catch(error) {
+    console.error('Error when getting user reservations:', util.inspect(error, utilOptions));
+    return new InternalErrorResponse('userReservations');
+  }
+}
+
 async function loginGraphql (args: User, context: MyContext) {
   console.log('args: ', args);
   try {
@@ -116,4 +137,4 @@ async function deleteUserGraphql(args: User) {
   }
 }
 
-export { loginGraphql, registerUserGraphql, getAllUsers, deleteUserGraphql, getUserByEmail }
+export { loginGraphql, registerUserGraphql, getAllUsers, deleteUserGraphql, getUserByEmail, getUserReservations }
