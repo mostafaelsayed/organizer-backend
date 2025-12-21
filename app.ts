@@ -39,15 +39,29 @@ function ensureLoggedIn(req: any) {
   }
 }
 
+function setCookieDomain() {
+  if (process.env.FRONTEND_ORIGIN?.startsWith('http://localhost')) {
+    return 'localhost';
+  }
+  else {
+    const domain = process.env.FRONTEND_ORIGIN?.substring(process.env.FRONTEND_ORIGIN?.indexOf('://') + 3, process.env.FRONTEND_ORIGIN?.length);
+    console.log('dom: ', domain);
+    return domain;
+  }
+}
+
 function startExpressApp() {
+  app.set('trust proxy', 1)
   app.use(
     session({
       saveUninitialized: false,
       resave: false,
+      proxy: true,
       secret: 'organizer-app',
       cookie: {
+        // domain: setCookieDomain(),
         secure: false,
-        sameSite: 'lax',
+        sameSite: 'none',
         httpOnly: true,
         maxAge: 60 * 1000 * 60 * 1
       }
@@ -58,9 +72,7 @@ function startExpressApp() {
   app.use(bodyParser.json());
 
   app.use((req, res, next) => {
-    if (req.headers.origin == process.env.FRONTEND_ORIGIN) {
-      res.setHeader("Access-Control-Allow-Origin", String(req.headers.origin));
-    }
+    res.setHeader("Access-Control-Allow-Origin", String(process.env.FRONTEND_ORIGIN));
     res.setHeader("Access-Control-Allow-Methods", "POST");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
     res.setHeader("Access-Control-Allow-Credentials", "true");
