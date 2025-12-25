@@ -50,7 +50,7 @@ async function getUserReservations(context: MyContext) {
       }
     });
 
-    const user = reservations[0].getUser();
+    const user = reservations[0] ? reservations[0].getUser() : undefined;
 
     return new SuccessResponse('userReservations', {user,reservations});
   }
