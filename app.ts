@@ -115,5 +115,6 @@ function startFrontendServer() {
     console.log('frontend on 5173');
   });
 }
-
-startFrontendServer();
+if (!process.env.FRONTEND_ORIGIN?.startsWith('http://localhost')) {
+  startFrontendServer();
+}
