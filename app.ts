@@ -98,8 +98,22 @@ function startExpressApp() {
 
   app.listen(port, () => {
     console.log(`Listening on port ${port}`);
-    console.log('devvvvvvv');
   });
 }
 
 startGraphqlServer();
+
+function startFrontendServer() {
+  const app2 = express();
+  app2.use(express.static(path.join(__dirname, 'frontend/dist')));
+
+  app2.get("/*all", function (req, res) {
+    res.sendFile(path.join(__dirname, 'frontend/dist', 'index.html'));
+  });
+
+  app2.listen(5173, () => {
+    console.log('frontend on 5173');
+  });
+}
+
+startFrontendServer();
