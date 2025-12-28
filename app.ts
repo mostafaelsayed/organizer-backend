@@ -11,6 +11,7 @@ import http from 'http';
 import { expressMiddleware } from '@as-integrations/express5';
 import { MyContext } from './models/my-context';
 
+const localEnv = process.env.FRONTEND_ORIGIN?.startsWith('http://localhost');
 const app = express();
 const httpServer = http.createServer();
 const typeDefs = readFileSync(path.join(__dirname, './graphql/schema.graphql'), 'utf-8');
@@ -40,16 +41,22 @@ function ensureLoggedIn(req: any) {
 }
 
 function startExpressApp() {
-  app.set('trust proxy', 1)
+  app.use((req, res, next) => {
+    Object.defineProperty(req, 'secure', {
+      configurable: true,
+      enumerable: true,
+      value: req.headers['forwarded']?.endsWith(';proto=https') && !localEnv
+    });
+    next();
+  });
   app.use(
     session({
       saveUninitialized: false,
       resave: false,
-      proxy: true,
       secret: 'organizer-app',
       cookie: {
-        secure: false,
-        sameSite: 'none',
+        secure: !localEnv,
+        sameSite: localEnv ? 'lax' : 'none',
         httpOnly: true,
         maxAge: 60 * 1000 * 60 * 1
       }
@@ -60,7 +67,6 @@ function startExpressApp() {
   app.use(bodyParser.json());
 
   app.use((req, res, next) => {
-    // app.set('trust proxy', true)
     res.setHeader("Access-Control-Allow-Origin", String(process.env.FRONTEND_ORIGIN));
     res.setHeader("Access-Control-Allow-Methods", "POST,GET");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
@@ -102,19 +108,3 @@ function startExpressApp() {
 }
 
 startGraphqlServer();
-
-function startFrontendServer() {
-  const app2 = express();
-  app2.use(express.static(path.join(__dirname, 'frontend/dist')));
-
-  app2.get("/*all", function (req, res) {
-    res.sendFile(path.join(__dirname, 'frontend/dist', 'index.html'));
-  });
-
-  app2.listen(5173, () => {
-    console.log('frontend on 5173');
-  });
-}
-if (!process.env.FRONTEND_ORIGIN?.startsWith('http://localhost')) {
-  startFrontendServer();
-}

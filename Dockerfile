@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 # Install app dependencies
 COPY package.json /usr/src/app/
-RUN npm install
+RUN npm install --omit=dev
 
 # Bundle app source
 COPY . /usr/src/app
