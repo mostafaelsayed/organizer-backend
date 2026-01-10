@@ -12,7 +12,7 @@ import Response from '../../models/response/response';
 import { Reservation, User } from '../../models/models';
 import { deleteReservationGraphql } from '../../routes/reservation/reservation';
 import { MyContext } from '../../models/my-context';
-
+import { createBasicAuthUser } from '../../services/user-service';
 async function getAllUsers(): Promise<Response> {
   try {
     const users = await User.findAll();
@@ -68,10 +68,9 @@ async function loginGraphql (args: User, context: MyContext) {
       return null;
     }
 
-    const hash: string = userRecord.passwordHash;
-    const reservations: Reservation[] = await userRecord.getReservations();
+    const hash: string | undefined = userRecord.passwordHash;
 
-    const isMatch: boolean = await bcrypt.compare(args.password, hash);
+    const isMatch: boolean | void = await bcrypt.compare(args.password, String(hash));
     if (isMatch) {
       const jwt: string = getToken(args.email, userRecord.id);
       context.req.session.user = userRecord;
@@ -90,16 +89,7 @@ async function registerUserGraphql(args: User) {
   const { email, firstName, lastName, password, phoneNumber } = args;
   
   try {
-    const salt: string = await bcrypt.genSalt(10);
-    const hash: string = await bcrypt.hash(password, salt);
-
-    const user: User = await User.create({
-      email,
-      firstName,
-      lastName,
-      phoneNumber,
-      passwordHash: hash,
-    });
+    const user = await createBasicAuthUser(email, firstName, lastName, phoneNumber, password);
 
     return new SuccessResponse('register', { email: user.email });
   }

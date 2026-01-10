@@ -10,8 +10,9 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import http from 'http';
 import { expressMiddleware } from '@as-integrations/express5';
 import { MyContext } from './models/my-context';
+import {openidSignup, openidLogin, googlesignin, googlesignup} from './openid/openid-client';
 
-const localEnv = process.env.FRONTEND_ORIGIN?.startsWith('http://localhost');
+const localEnv = process.env.FRONTEND_ORIGIN?.startsWith('http://localhost') || !process.env.FRONTEND_ORIGIN;
 const app = express();
 const httpServer = http.createServer();
 const typeDefs = readFileSync(path.join(__dirname, './graphql/schema.graphql'), 'utf-8');
@@ -29,6 +30,17 @@ async function startGraphqlServer() {
   startExpressApp();
 }
 
+function isOauthUrl(url: string) {
+  const oauthUrls = ['/googlesignin', '/googlesignup', '/openidlogin', '/openidsignup'];
+  for (const x of oauthUrls) {
+    if (url.includes(x)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 function ensureLoggedIn(req: any) {
   if (!req.session.user) {
     console.error('not signed in');
@@ -42,17 +54,22 @@ function ensureLoggedIn(req: any) {
 
 function startExpressApp() {
   app.use((req, res, next) => {
-    Object.defineProperty(req, 'secure', {
-      configurable: true,
-      enumerable: true,
-      value: req.headers['forwarded']?.endsWith(';proto=https') && !localEnv
-    });
-    next();
+    if (!localEnv) {
+      Object.defineProperty(req, 'secure', {
+        configurable: true,
+        enumerable: true,
+        value: req.headers['forwarded']?.endsWith(';proto=https')
+      });
+      next();
+    }
+    else {
+      next();
+    }
   });
   app.use(
     session({
-      saveUninitialized: false,
-      resave: false,
+      saveUninitialized: true,
+      resave: true,
       secret: 'organizer-app',
       cookie: {
         secure: !localEnv,
@@ -65,18 +82,26 @@ function startExpressApp() {
 
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
-
+  const allowedOrigins = ['http://localhost:5173', String(process.env.FRONTEND_ORIGIN)]
   app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", String(process.env.FRONTEND_ORIGIN));
+    console.log('orig: ', String(req.url));
+    if (allowedOrigins.includes(String(req.headers.origin))) {
+      res.setHeader("Access-Control-Allow-Origin", String(req.headers.origin));
+    }
     res.setHeader("Access-Control-Allow-Methods", "POST,GET");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
     res.setHeader("Access-Control-Allow-Credentials", "true");
+    
     if (req.method == 'GET') {
       res.send(200);
       return;
     }
     if (req.method == 'OPTIONS') {
       res.sendStatus(204);
+      return;
+    }
+    if (isOauthUrl(req.url)) {
+      next();
       return;
     }
     if (!req.body.query.includes('login') && !req.body.query.includes('register')) {
@@ -90,8 +115,20 @@ function startExpressApp() {
     else {
       next();
     }
-  })
-
+  });
+  app.use('/googlesignup', async (req: any, res) => {
+    googlesignup(req, res);
+  });
+  app.use('/googlesignin', async (req: any, res) => {
+    googlesignin(req, res);
+  });
+  app.use('/openidsignup', async (req: any, res) => {
+    console.log('openid begin');
+    openidSignup(req, res);
+  });
+  app.use('/openidlogin', async(req: any, res) => {
+    openidLogin(req, res);
+  });
   app.use(
     expressMiddleware(server, {
       context: async ({ req }) => ({ req: req }),

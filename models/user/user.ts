@@ -5,13 +5,14 @@ import Reservation from '../reservation/reservation';
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<number>;
   declare email: string;
-  declare firstName: string;
+  declare firstName?: string;
   declare lastName?: CreationOptional<string>;
   declare phoneNumber?: CreationOptional<string>;
-  declare passwordHash: string;
+  declare passwordHash?: string;
   declare password: NonAttribute<string>;
   declare reservations?: NonAttribute<Reservation[]>;
   declare getReservations: HasManyGetAssociationsMixin<Reservation>
+  declare authType: string;
 
   // Timestamps
   declare createdAt?: CreationOptional<Date>;
@@ -36,7 +37,7 @@ User.init(
     },
     firstName: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     lastName: {
       type: DataTypes.STRING,
@@ -46,7 +47,12 @@ User.init(
     },
     passwordHash: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
+    },
+    authType: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'basic'
     }
 
   },

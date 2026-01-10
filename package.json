@@ -18,7 +18,8 @@
         "@types/jsonwebtoken": "^9.0.9",
         "@types/node": "22.13.17",
         "ts-node": "10.9.2",
-        "typescript": "5.8.2"
+        "typescript": "5.8.2",
+        "openid-client": "6.8.1"
     },
     "scripts": {
         "dev": "ts-node-dev --exit-child app.ts",
