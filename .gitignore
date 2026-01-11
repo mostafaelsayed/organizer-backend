@@ -4,3 +4,4 @@ Collections
 .vscode
 sql-creds
 frontend
+secrets.json

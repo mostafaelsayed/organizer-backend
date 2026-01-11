@@ -117,10 +117,17 @@ function startExpressApp() {
     }
   });
   app.use('/googlesignup', async (req: any, res) => {
-    googlesignup(req, res);
+    const user = await googlesignup(req);
+    
   });
   app.use('/googlesignin', async (req: any, res) => {
-    googlesignin(req, res);
+    const user = await googlesignin(req, res);
+    if (user !== undefined && user !== null) {
+      res.send(200);
+    }
+    else {
+      res.send(401);
+    }
   });
   app.use('/openidsignup', async (req: any, res) => {
     console.log('openid begin');

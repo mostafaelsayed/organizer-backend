@@ -50,9 +50,7 @@ async function getUserReservations(context: MyContext) {
       }
     });
 
-    const user = reservations[0] ? reservations[0].getUser() : undefined;
-
-    return new SuccessResponse('userReservations', {user,reservations});
+    return new SuccessResponse('userReservations', {user: context.req.session.user,reservations});
   }
   catch(error) {
     console.error('Error when getting user reservations:', util.inspect(error, utilOptions));

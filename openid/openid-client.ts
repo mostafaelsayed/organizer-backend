@@ -2,12 +2,19 @@ import { Response } from 'express';
 import * as client from 'openid-client'
 import url from 'url';
 import { createOauthUser } from '../services/user-service';
+import { User } from '../models/models';
+
+let localSecrets: any = {};
+
+if (!process.env.OAUTH_CLIENT_ID) {
+    localSecrets = require('../secrets.json')
+}
 
 // Prerequisites
 
 let server: URL = new URL('https://accounts.google.com/.well-known/openid-configuration'); // Authorization server's Issuer Identifier URL
-let clientId: string = process.env.OAUTH_CLIENT_ID || '';
-let clientSecret: string = process.env.OAUTH_CLIENT_SECRET || '';
+let clientId: string = process.env.OAUTH_CLIENT_ID || localSecrets.OAUTH_CLIENT_ID;
+let clientSecret: string = process.env.OAUTH_CLIENT_SECRET || localSecrets.OAUTH_CLIENT_SECRET;
 /**
  * Value used in the authorization request as redirect_uri pre-registered at the
  * Authorization Server.
@@ -23,7 +30,7 @@ export async function init() {
     return config;
 }
 
-export async function googlesignup(req: any, res: any) {
+export async function googlesignup(req: any): Promise<User | undefined> {
     console.log('req body: ', JSON.stringify(req.body));
     console.log('req url: ', req.query);
     let x = url.parse(req.url).query;
@@ -52,20 +59,22 @@ export async function googlesignup(req: any, res: any) {
 
         let userInfo = await client.fetchUserInfo(config, access_token, sub)
 
-        const user = await createOauthUser(String(userInfo.email), String(userInfo.given_name), String(userInfo.family_name), String(userInfo.phone_number));
-
+        const user = await createOauthUser(String(userInfo.email), userInfo.given_name, userInfo.family_name, userInfo.phone_number)
         req.session.user = user;
 
         console.log('UserInfo Response', userInfo);
+
+        return user;
     }
     catch(e) {
         console.error('er: ', JSON.stringify(e));
     }
 }
 
-export async function googlesignin(req: any, res: any) {
+export async function googlesignin(req: any, res: any): Promise<User | undefined> {
     console.log('req body: ', JSON.stringify(req.body));
     console.log('req url: ', req.query);
+    console.log('req user: ', req.session.user);
     let x = url.parse(req.url).query;
     console.log('x: ', x);
     // one eternity later, the user lands back on the redirect_uri
@@ -90,12 +99,22 @@ export async function googlesignin(req: any, res: any) {
 
         // UserInfo Request
 
-        let userInfo = await client.fetchUserInfo(config, access_token, sub)
+        let userInfo = await client.fetchUserInfo(config, tokens.access_token, claims.sub)
 
-        console.log('UserInfo Response', userInfo)
+        const userRecord: User | null = await User.findOne({ where: { email: userInfo.email } });
+        if (!userRecord) {
+            return undefined;
+        }
+
+        req.session.user = userRecord;
+
+        console.log('UserInfo Response', userInfo);
+
+        return userRecord;
     }
-    catch(e) {
-        console.error('er: ', JSON.stringify(e));
+    catch(e: any) {
+        console.error('er: ', e.stack);
+        console.error('eror : ', e);
     }
 }
 
@@ -113,7 +132,6 @@ export async function openidSignup(req: any, res: Response) {
     let code_verifier = client.randomPKCECodeVerifier()
     let code_challenge = await client.calculatePKCECodeChallenge(code_verifier)
     let nonce!: string
-
 
     // redirect user to as.authorization_endpoint
     let parameters: Record<string, string> = {
@@ -138,9 +156,6 @@ export async function openidSignup(req: any, res: Response) {
         code_verifier
     }
 
-    
-
-
     let redirectTo = client.buildAuthorizationUrl(config, parameters)
 
     console.log('redirecting to', redirectTo.href);
@@ -154,8 +169,6 @@ export async function openidSignup(req: any, res: Response) {
             console.error('error saving sess: ', err);
         }
     });
-    
-
 }
 
 export async function openidLogin(req: any, res: Response) {
@@ -172,7 +185,6 @@ export async function openidLogin(req: any, res: Response) {
     let code_verifier = client.randomPKCECodeVerifier()
     let code_challenge = await client.calculatePKCECodeChallenge(code_verifier)
     let nonce!: string
-
 
     // redirect user to as.authorization_endpoint
     let parameters: Record<string, string> = {
@@ -196,9 +208,6 @@ export async function openidLogin(req: any, res: Response) {
         nonce,
         code_verifier
     }
-
-    
-
 
     let redirectTo = client.buildAuthorizationUrl(config, parameters)
 
