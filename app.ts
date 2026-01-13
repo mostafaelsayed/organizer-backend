@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request } from 'express';
 import bodyParser from 'body-parser';
 import session from 'express-session';
 import { port } from './config';
@@ -84,7 +84,7 @@ function startExpressApp() {
   app.use(bodyParser.json());
   const allowedOrigins = ['http://localhost:5173', String(process.env.FRONTEND_ORIGIN)]
   app.use((req, res, next) => {
-    console.log('orig: ', String(req.url));
+    // console.log('orig: ', String(req.url));
     if (allowedOrigins.includes(String(req.headers.origin))) {
       res.setHeader("Access-Control-Allow-Origin", String(req.headers.origin));
     }
@@ -104,7 +104,7 @@ function startExpressApp() {
       next();
       return;
     }
-    if (!req.body.query.includes('login') && !req.body.query.includes('register')) {
+    if (!req.url.endsWith('/logout') && !req?.body?.query?.includes('login') && !req?.body?.query?.includes('register')) {
       if (ensureLoggedIn(req)) {
         next();
       }
@@ -116,13 +116,22 @@ function startExpressApp() {
       next();
     }
   });
+  app.use('/logout', (req: any, res: any) => {
+    req.session.user = null;
+    res.send(200);
+  });
   app.use('/googlesignup', async (req: any, res) => {
     const user = await googlesignup(req);
-    
+    if (user) {
+      res.send(200);
+    }
+    else {
+      res.send(401);
+    }
   });
   app.use('/googlesignin', async (req: any, res) => {
     const user = await googlesignin(req, res);
-    if (user !== undefined && user !== null) {
+    if (user) {
       res.send(200);
     }
     else {
