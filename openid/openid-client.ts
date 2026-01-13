@@ -19,8 +19,8 @@ let clientSecret: string = process.env.OAUTH_CLIENT_SECRET || localSecrets.OAUTH
  * Value used in the authorization request as redirect_uri pre-registered at the
  * Authorization Server.
  */
-let signup_redirect_uri: string = ('http://localhost:5173/oauthsignup');
-let login_redirect_uri: string = ('http://localhost:5173/oauthlogin');
+let signup_redirect_uri: string = ((process.env.FRONTEND_ORIGIN || 'http://localhost:5173') + '/oauthsignup');
+let login_redirect_uri: string = ((process.env.FRONTEND_ORIGIN || 'http://localhost:5173') + '/oauthlogin');
 
 // End of prerequisites
 
@@ -31,10 +31,7 @@ export async function init() {
 }
 
 export async function googlesignup(req: any): Promise<User | undefined> {
-    console.log('req body: ', JSON.stringify(req.body));
-    console.log('req url: ', req.query);
     let x = url.parse(req.url).query;
-    console.log('x: ', x);
     // one eternity later, the user lands back on the redirect_uri
     // Authorization Code Grant
     let sub: string
@@ -48,10 +45,8 @@ export async function googlesignup(req: any): Promise<User | undefined> {
             idTokenExpected: true,
         });
 
-        console.log('Token Endpoint Response', tokens);
         ({ access_token } = tokens)
-        let claims = tokens.claims()!
-        console.log('ID Token Claims', claims);
+        let claims = tokens.claims()!;
         ({ sub } = claims)
 
 
@@ -62,8 +57,6 @@ export async function googlesignup(req: any): Promise<User | undefined> {
         const user = await createOauthUser(String(userInfo.email), userInfo.given_name, userInfo.family_name, userInfo.phone_number)
         req.session.user = user;
 
-        console.log('UserInfo Response', userInfo);
-
         return user;
     }
     catch(e) {
@@ -72,11 +65,7 @@ export async function googlesignup(req: any): Promise<User | undefined> {
 }
 
 export async function googlesignin(req: any, res: any): Promise<User | undefined> {
-    console.log('req body: ', JSON.stringify(req.body));
-    console.log('req url: ', req.query);
-    console.log('req user: ', req.session.user);
     let x = url.parse(req.url).query;
-    console.log('x: ', x);
     // one eternity later, the user lands back on the redirect_uri
     // Authorization Code Grant
     let sub: string
@@ -90,10 +79,8 @@ export async function googlesignin(req: any, res: any): Promise<User | undefined
             idTokenExpected: true,
         });
 
-        console.log('Token Endpoint Response', tokens);
         ({ access_token } = tokens)
-        let claims = tokens.claims()!
-        console.log('ID Token Claims', claims);
+        let claims = tokens.claims()!;
         ({ sub } = claims)
 
 
@@ -107,8 +94,6 @@ export async function googlesignin(req: any, res: any): Promise<User | undefined
         }
 
         req.session.user = userRecord;
-
-        console.log('UserInfo Response', userInfo);
 
         return userRecord;
     }
@@ -157,9 +142,6 @@ export async function openidSignup(req: any, res: Response) {
     }
 
     let redirectTo = client.buildAuthorizationUrl(config, parameters)
-
-    console.log('redirecting to', redirectTo.href);
-    // now redirect the user to redirectTo.href
 
     req.session.save((err: any) => {
         if (!err) {
@@ -211,9 +193,6 @@ export async function openidLogin(req: any, res: Response) {
 
     let redirectTo = client.buildAuthorizationUrl(config, parameters)
 
-    console.log('redirecting to', redirectTo.href);
-    // now redirect the user to redirectTo.href
-
     req.session.save((err: any) => {
         if (!err) {
             res.send({ redirect: redirectTo.href });
@@ -222,6 +201,4 @@ export async function openidLogin(req: any, res: Response) {
             console.error('error saving sess: ', err);
         }
     });
-    
-
 }
