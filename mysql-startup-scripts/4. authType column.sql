@@ -1,0 +1,1 @@
+ALTER TABLE `organizer`.`users` ADD COLUMN `authType` varchar(50) DEFAULT 'basic';
